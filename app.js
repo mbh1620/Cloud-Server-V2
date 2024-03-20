@@ -17,27 +17,19 @@ const { exec } = require('child_process');
 var checkUserMiddleware = require("./middleware/index").checkUser;
 var EventEmitter = require("events")
 
-var workflowRoutes = require('./routes/workflow/workflowRoutes').router;
 var storageRoutes = require('./routes/storage/storageRoutes').router;
-var codeRoutes = require('./routes/code/codeRoutes').router;
 var websiteRoutes = require('./routes/websites/websiteRoutes').router;
 var databaseRoutes = require('./routes/database/databaseRoutes').router;
-var crawlerRoutes = require('./routes/crawler/crawlerRoutes').router;
-var streamingRoutes = require('./routes/data-streaming/streamingRoutes').router
-var iotRoutes = require('./routes/iot/iotRoutes').router;
-var learningRoutes = require('./routes/learning/learningRoutes').router;
 var formsRoutes = require('./routes/forms/form-routes').router;
 var chartRoutes = require('./routes/chart/chartRoutes').router;
+
 var logRoutes = require('./routes/log/logRoutes').router;
 var mediaRoutes = require('./routes/media/mediaRoutes').router;
 var ticketRoutes = require('./routes/tickets/ticketRoutes').router;
-var eventsRoutes = require('./routes/event-triggers/eventTriggerRoutes').router;
 var securityRoutes = require('./routes/security/securityRoutes').router;
 
 global.testFolder;
 global.eventEmitter = new EventEmitter();
-
-//Configure the app based on whether its development, production or testing for github
 
 /*
 
@@ -107,21 +99,14 @@ app.use('/modules', express.static("modules"));
 app.use(checkUserMiddleware, express.static(testFolder));
 
 app.use("/", storageRoutes);
-app.use("/", workflowRoutes);
 app.use("/", websiteRoutes);
 app.use("/", databaseRoutes);
-app.use("/", crawlerRoutes);
-app.use("/", streamingRoutes);
-app.use("/", iotRoutes);
-app.use("/", learningRoutes);
 app.use("/", formsRoutes);
 app.use("/", chartRoutes);
 app.use("/", logRoutes);
 app.use("/", mediaRoutes);
 app.use("/", ticketRoutes);
-app.use("/", eventsRoutes);
 app.use("/", securityRoutes);
-app.use("/", codeRoutes);
     
 //----------------------------------------------------------
 //                          ROUTES
@@ -163,12 +148,8 @@ app.post("/register", function (req, res) {
         })
 
         fs.mkdirSync(testFolder + name);
-        fs.mkdirSync(testFolder + name + "/Code");
         fs.mkdirSync(testFolder + name + "/Websites");
         fs.mkdirSync(testFolder + name + "/Database" );
-        fs.mkdirSync(testFolder + name + "/" + "Workflows");
-        fs.mkdirSync(testFolder + name + "/Workflows/Logs" );
-        fs.writeFileSync(testFolder + name + "/Workflows/workflow.json", '{"workflows":[]}')
 
         var data = JSON.parse(fs.readFileSync("users.json"))
 
