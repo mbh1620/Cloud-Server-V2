@@ -1,0 +1,25 @@
+<% include ./partials/header.ejs %>
+<div class="container">
+<h1>Settings</h1>
+<% if(!currentUser){ %>
+
+<% } else { %>
+    
+    <button class="btn btn-md btn-light" onclick="window.location.href='/usersfiles/<%=currentUser.name%>'">My Storage</button>
+    <button class="btn btn-md btn-danger" onclick="deleteAccount()">Delete Account</button>
+<% } %>
+
+<h3>Storage</h3> 
+<h3>Connected HDD</h3> 
+
+<% include ./partials/footer.ejs %>
+</div>
+<script>
+function deleteAccount(){
+    $.post(
+    url='/delete-account',
+    data={
+        userName:'<%= currentUser.name %>'
+    })
+}
+</script>

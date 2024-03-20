@@ -1,0 +1,17 @@
+<% include ../partials/logheader.ejs %>
+
+<div class="container">
+<h1>Logging</h1>
+<p>View Logs and Charts from various resources</p>
+<% if(!currentUser){ %>
+
+<% } else { %>
+    
+    <button class="btn btn-md btn-light" onclick="window.location.href='/logs/usersLogs/'">Logs</button>
+    <button class="btn btn-md btn-light" onclick="window.location.href='/workflows/settings'">Settings</button>
+    
+<% } %>
+</div>
+
+
+<% include ../partials/footer.ejs %>

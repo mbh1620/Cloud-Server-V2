@@ -1,0 +1,64 @@
+<% include ../partials/iot-header.ejs %>
+<div class="container" style="position: relative;">
+    <h1>Add a new IOT Device</h1>
+    <form action="/iot/create" method="POST">
+    <input style="margin-top:30px" type="text" id="nameBox" name="device[name]" class="namebox form-control w-50" placeholder="Device Name"
+        aria-label="Example text with button addon" aria-describedby="button-addon1">
+
+    <h4 style="margin-top:20px">Device Configuration</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">Device Type</label>
+    <select class="form-control w-25" name="device[Type]">
+        <option>Sensor</option>
+        <option>Button</option>
+        <option>Camera</option>
+        <option>Microphone</option>
+        <option>Light</option>
+        <option>Smart Meter</option>
+    </select>
+    <label for="directoryInput" class="form-label" >Device IP: </label>
+    <input class="form-control w-25" type="text" name="device[ip]">
+    <label for="directoryInput" class="form-label">Device HostName: </label>
+    <input class="form-control w-25" type="text" name="device[hostName]">
+    </div>
+    
+    <h4 style="margin-top:20px">Schedule</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">Schedule for how long to receive a measurement, photo, or to check that the device is still active.</label></br>
+    <input style="margin-bottom:10px;display:inline" type="number" id="directoryInput" class="namebox form-control w-25" placeholder="Schedule"
+        aria-label="Example text with button addon" aria-describedby="button-addon1" name="device[Schedule]" value=""> <label style="display:inline">Minutes</label>
+    </div>
+    <h4 style="margin-top:20px">Over-the-Air Updates</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">Program this device over-the-air.</label></br>
+    <input style="margin-bottom:10px;display:inline" type="number" id="directoryInput" class="namebox form-control w-25" placeholder="Schedule"
+        aria-label="Example text with button addon" aria-describedby="button-addon1" value=""> <label style="display:inline">Minutes</label>
+    </div>
+    <h4 style="margin-top:20px">Data-store</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">Choose where to store the data produced by this device.</label></br>
+    <select class="form-control w-25">
+        <option>Storage Directory</option>
+        <option>NoSQL Database</option>
+    </select>
+    </div>
+    <h4 style="margin-top:20px">Access</h4>
+    <div class="form-control" style="width:100%">
+        <p>Input usernames that can access this device.</p>
+    <label for="directoryInput" class="form-label">Username list (Separated by comma)</label>
+    <textarea class="form-control"></textarea>
+    </div>
+    <input type="hidden" value="<%= currentUser.id %>" name="userId">
+    <button  style="margin-top:30px" class="btn btn-primary">Create</button>
+</form>
+</div>
+<script>
+
+    function createDevice(){
+
+    }
+
+</script>
+    
+
+<% include ../partials/footer.ejs %>

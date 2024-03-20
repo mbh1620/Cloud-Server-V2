@@ -1,0 +1,51 @@
+<% include ../partials/chartheader.ejs %>
+    <div class="" style="position: relative;width:50%;margin: 0 auto;">
+        <h1>
+            Tickets
+        </h1>
+        <div class="form-control">
+
+            <div class="container" style="width:50%;height:500px;margin:0 auto;margin-top:30px">
+                <label for="ticketName">Name: </label>
+                <input type="text" class="form-control w-50" id="ticketName" name="ticketName"
+                    placeholder="Ticket Name">
+                <label for="ticketDetail" style="margin-top:20px">Detail: </label>
+                <textarea class="form-control w-50" id="ticketDetail" placeholder="Ticket Detail"></textarea>
+                <label for="ticketDeadline" style="margin-top:20px">Complete by: </label>
+                <input type="date" class="form-control w-25" id="ticketDeadline">
+                <button class="btn btn-primary btn-sm" style="margin-top:20px" onclick="submitTicket()">create</button>
+            </div>
+
+        </div>
+
+        <script src="/modules/TicketScripts/ticketFunctions.js"></script>
+        <script>
+
+            function submitTicket() {
+
+                var ticketObject = {
+
+                    ticketName: $('#ticketName').val(),
+                    ticketDetail: $('#ticketDetail').val(),
+                    ticketDeadline: $('#ticketDeadline').val(),
+                    ticketDone: false
+                
+                }
+
+                createTicket(ticketObject,function(){
+
+                    location.href= "/tickets/users-tickets"
+
+                })
+
+            }
+
+
+
+            
+
+        </script>
+
+    </div>
+
+    <% include ../partials/footer.ejs %>

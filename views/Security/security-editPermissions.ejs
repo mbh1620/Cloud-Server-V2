@@ -1,0 +1,71 @@
+<% include ../partials/securityheader.ejs %>
+<div class="container" style="position: relative;">
+    <h1>Edit Permissions for <%= path %>/<%= file %></h1>
+    <form action="/security/update" method="POST">
+
+    <h4 style="margin-top:20px">Security Type</h4>
+    <div class="form-control" style="width:100%">
+    <select class="form-control w-25" id="securityType" onchange="showDiv()" name="securityType">
+        <option value="private">Private (Default)</option>
+        <option value="limited">Limited To List of Users</option>
+        <option value="public">Public</option>
+    </select>
+    <input type="hidden" name="path" value="<%= path %>">
+    <input type="hidden" name="file" value="<%= file %>">
+
+    <h4 style="margin-top:20px;display:none" class="usernames">Add User names to list</h4>
+    <div class="form-control usernames" style="width:100%;height:300px;display:none">
+    <textarea class="form-control" id="userList" name="userList" style="height:100%"><% for(var i = 0; i < permissions.userList.length; i++){ %><%= permissions.userList[i] %>,<% } %>
+    </textarea>
+    </div>
+</div>
+    <input type="hidden" value="<%= currentUser.id %>" name="userId">
+    <button  style="margin-top:30px" class="btn btn-primary">Update</button>
+</form>
+</div>
+<script>
+
+    changeSelectionBox()
+    showDiv()
+
+    function showDiv(){
+
+        var value = $('#securityType').val()
+
+        if(value == 'limited'){
+            $('.usernames').show();
+        } else {
+            $('.usernames').hide();
+        }
+
+    }
+
+    function changeSelectionBox(){
+
+        var selectBoxValue = '<%= permissions.securityType %>'
+
+        $('#securityType').html(' ');
+
+        var newOptions = {
+            "Private (Default)":"private",
+            "Limited To List Of Users":"limited",
+            "Public":"public"
+        };
+
+        $.each(newOptions, function(key, value) {
+            if(value == selectBoxValue){
+                $('#securityType').append($("<option></option>")
+                .attr({"value":value,
+                        "selected":true}).text(key));
+            } else {
+                $('#securityType').append($("<option></option>")
+                .attr("value", value).text(key));
+            }
+            
+        });
+    }
+
+</script>
+    
+
+<% include ../partials/footer.ejs %>

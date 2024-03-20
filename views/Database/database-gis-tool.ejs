@@ -1,0 +1,248 @@
+<!-- This tool will be similar to the input record screen however will also include a map so that the user can pick GPS latitude and longitudes for the entry -->
+<% include ../partials/databaseheader.ejs %>
+    <div class="container">
+        <div class="form-control">
+            <label for="">Database (Must contain Latitude and Longitude Fields)</label>
+            <select class="form-control w-25" id="databaseSelectBox" onchange="updateFieldSelectBoxes()">
+
+            </select>
+            <label for="">Latitude Field</label>
+            <select class="form-control w-25 field" id="latSelection">
+                <option></option>
+            </select>
+            <label for="">Longitude Field</label>
+            <select class="form-control w-25 field" id="longSelection">
+                <option></option>
+            </select>
+            <label for="">Element Type</label>
+            <select class="form-control w-25" id="elementType">
+                <option value="poly-line">Poly-line</option>
+                <option value="single point">Single Points</option>
+                <option value="polygon">Polygon Shape</option>
+            </select>
+            <label for="">Data Entry (click Map to add new records)</label>
+            <textarea onkeyup="prettyPrint()" rows="15" id='jsonDataInput' class="form-control">
+
+</textarea>
+            <button class="btn btn-sm btn-primary" onclick="submitFunction()">Input Data</button>
+
+        </div>
+
+
+        <% include ../Chart/map-template %>
+    </div>
+    <script src="/modules/DatabaseScripts/databaseFunctions.js"></script>
+    <script src="/modules/miscellanousFunctions/miscellanousFunctions.js"></script>
+    <script>
+
+        //Get users databases and fill out the Database Select Box
+
+        getUsersDatabases(function (databases) {
+
+            //Populate the database select box
+
+            populateSelectBoxObject('#databaseSelectBox', databases, 'dbName', 'databaseId')
+
+            //Get the databaseSchema and update the Data Entry text area
+
+
+        })
+
+        function submitFunction() {
+
+            if($('#elementType').val() == 'poly-line'){
+
+                var records = JSON.parse($('#jsonDataInput').val())
+
+                for(var i = 0; i < records.length; i++){
+
+                    inputRecord($('#databaseSelectBox').val(), JSON.stringify(records[i]))
+
+                }
+
+            } else {
+                
+                inputData($('#databaseSelectBox').val())
+
+            }
+
+
+        }
+
+        function updateFieldSelectBoxes() {
+
+            //Get Fields from schema and update .field 
+
+            $('.field').empty()
+
+            var databaseId = $('#databaseSelectBox').val()
+
+            getFields(databaseId, function (fields) {
+
+                populateSelectBoxArray('.field', fields)
+
+            })
+
+
+        }
+
+        var multipleRecords = []
+        var pathLatLongs = []
+        var pathDistances = []
+        var polyPath = L.polyline([], { color: 'red' }).addTo(map)
+
+        function addRecordToTextArea(latData, longData) {
+
+            var databaseId = $('#databaseSelectBox').val()
+
+            switch ($('#elementType').val()) {
+
+                case ('single point'):
+                    break;
+                case ('poly-line'):
+                    polyLineAddData(latData, longData)
+                    break;
+                case ('polygon'):
+                    break;
+
+            }
+
+            getFields(databaseId, function (fields) {
+
+                var appendString = '{'
+
+                for (var i = 0; i < fields.length; i++) {
+                    if (fields[i] == $('#latSelection').val()) {
+
+                        if (i == fields.length - 1) {
+                            appendString += `"${fields[i]}":"${latData}"`
+                        } else {
+                            appendString += `"${fields[i]}":"${latData}",`
+                        }
+
+                    } else if (fields[i] == $('#longSelection').val()) {
+
+                        if (i == fields.length - 1) {
+                            appendString += `"${fields[i]}":"${longData}"`
+                        } else {
+                            appendString += `"${fields[i]}":"${longData}",`
+                        }
+
+                    } else if (i == fields.length - 1) {
+
+                        appendString += `"${fields[i]}":""`
+
+                    } else {
+
+                        appendString += `"${fields[i]}":"",`
+
+                    }
+
+
+                }
+
+                appendString += '}'
+
+                $('#jsonDataInput').append(appendString)
+
+                prettyPrint()
+
+            })
+        }
+
+        //Get the Database Schema once selected and input into the textarea
+
+        function prettyPrint() {
+            var ugly = $('#jsonDataInput').val();
+            var obj = JSON.parse(ugly);
+            var pretty = JSON.stringify(obj, undefined, 4);
+            $('#jsonDataInput').val(pretty);
+        }
+
+        function polyLineAddData(latData, longData) {
+
+            var newLatLong = new L.LatLng(latData, longData)
+
+            addMultipleRecordsToTextArea(latData, longData)
+
+            polyPath.addLatLng(newLatLong)
+            pathLatLongs.push(newLatLong)
+
+            if(pathLatLongs.length > 0){
+
+                var distance = pathLatLongs[pathLatLongs.length-2].distanceTo(pathLatLongs[pathLatLongs.length-1])
+
+                pathDistances.push(distance)
+
+            }
+
+            getPathTotalDistance()
+
+        }
+
+        function getPathTotalDistance(){
+
+            var totalDistance = 0;
+
+            for(var i = 0; i < pathDistances.length; i++){
+
+                totalDistance += pathDistances[i]
+
+            }
+
+            console.log(`${totalDistance.toFixed(3)} meters`)
+
+            return totalDistance.toFixed(3)
+            
+        }
+
+        function addMultipleRecordsToTextArea(lat, long) {
+
+            recordObject = {}
+
+            var databaseId = $('#databaseSelectBox').val()
+
+            getFields(databaseId, function (fields) {
+
+                for (var i = 0; i < fields.length; i++) {
+
+                    if (fields[i] == $('#longSelection').val()) {
+
+                        recordObject[fields[i]] = `${long}`
+
+                    } else if (fields[i] == $('#latSelection').val()) {
+
+                        recordObject[fields[i]] = `${lat}`
+
+                    } else {
+
+                        recordObject[fields[i]] = ""
+
+                    }
+                }
+
+                multipleRecords.push(recordObject)
+
+                var string = JSON.stringify(multipleRecords)
+
+                $('#jsonDataInput').val(string)
+
+            })
+        }
+
+
+        map.on('click', function (e) {
+
+            // var newLatLong = new L.LatLng(e.latlng['lat'], e.latlng['lng'])
+
+            // coordinateMarker.setLatLng(newLatLong)
+
+            //Set the outputs lat and long to the new coordinates
+
+            addRecordToTextArea(e.latlng['lat'], e.latlng['lng'])
+
+        })
+
+
+    </script>
+    <% include ../partials/footer.ejs %>

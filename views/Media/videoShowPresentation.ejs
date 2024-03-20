@@ -1,0 +1,67 @@
+
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    </head>
+<body style="background-color: rgb(41, 41, 41);">
+    <video src="" id="movieBox" height="98.5%" width="auto" controls autoplay onended="videoEnd()" style="display:block;margin:0 auto">
+    </video>
+</body>
+</html>
+
+<script>
+
+    //Get the video paths from the server
+
+    var directory = '<%=directory%>'
+
+    var videoPaths;
+    var i = 0;
+
+    $.post({
+
+        url:'/media/getVideoPresentationLinks',
+        data:{
+            directory: directory
+        },
+        success:function(data){
+
+            videoPaths = data
+            
+            updateSourceForFirstVideo(data[0])
+
+            
+
+        }
+    })
+
+    function updateSourceForFirstVideo(videoLink){
+
+        var videoLink = '/video/play/'+videoLink
+
+        $('#movieBox').attr('src', videoLink)
+
+    }
+
+    function videoEnd(){
+
+        if(i+1 == videoPaths.length){
+            
+            i = 0
+            
+
+        } else {
+            
+            i += 1
+
+        }
+
+        var videoLink = '/video/play/'+videoPaths[i]
+
+        $('#movieBox').attr('src', videoLink)
+
+    }
+    
+
+</script>
+

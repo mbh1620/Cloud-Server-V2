@@ -1,0 +1,23 @@
+<% include ./partials/header.ejs %>
+
+<div class="container">
+<h1 style="margin-top:40px"> Server Logs </h1>
+<h2> Nodes </h2>
+<h5> Raspberry Pi 4</h5>
+<p>HostName: raspberrypi1</p>
+<p id="cpuUsage">usage</p>
+<button onclick="getData()">getData</button>
+</div>
+<script>
+    function getData(){
+        $.get({
+            url:'/logs/get-data', 
+            success: function(result){
+                $('#cpuUsage').html(result.cpuUsage)
+                console.log(result)
+            }
+        })
+    }
+</script>
+
+<% include ./partials/footer.ejs %>

@@ -1,0 +1,92 @@
+<% include ../partials/chartheader.ejs %>
+    <div class="container" style="position: relative;">
+        <a href="/chart/home">Back</a>
+        <h1>Create Table</h1>
+        <p>Create a table using data from a database so that the chart can then be embedded in a dashboard.</p>
+        <h4 style="margin-top:20px">Table Name</h4>
+        <input style="margin-top:30px" type="text" id="chartName" class="namebox form-control w-50"
+            placeholder="Table Name" aria-label="Example text with button addon" aria-describedby="button-addon1">
+
+        <h4 style="margin-top:20px">Table View Creation</h4>
+        <div class="form-control" style="width:100%">
+            <label>Chart Data Source</label>
+            <select class="form-control w-25" id="databaseSelection" onchange="changeDatabaseSelection()">
+                <option selected disabled hidden>Select Database</option>
+                <% for (var i=0; i < usersDatabases.length; i++){ %>
+                    <option value="<%= usersDatabases[i].databaseId %>">
+                        <%= usersDatabases[i].dbName %>
+                    </option>
+                    <% } %>
+            </select>
+
+        </div>
+        <h4 style="margin-top:20px" id="chartConfigTitle">Table Configuration</h4>
+       
+        <% include ../Database/querybox-template.ejs %>
+        <h4 style="margin-top:20px">Table View Preview</h4>
+        <% include ../Database/table-template.ejs %>
+
+            <button class="btn btn-sm btn-primary" onclick="saveTable()">Save Table</button>
+                <script>
+                    
+                    var chart; 
+                    var databaseSchema;
+                    var datasetQueries = []
+                    
+                    function changeDatabaseSelection() {
+
+                        var databaseId = $('#databaseSelection').val()
+
+                        //Query to get the field
+
+                        getDatabaseSchema(databaseId, function (data) {
+
+                            databaseSchema = data;
+
+                            var fields = Object.keys(data)
+
+                            $('.field').empty()
+                            var string = ""
+                            for (var i = 0; i < fields.length; i++) {
+                                string += "<option>" + fields[i] + "</option>"
+                            }
+
+                            string += "<option>recordId</option>"                            
+                            string += "<option>dateTime</option>"                            
+                            $('.field').append(string)
+
+                        })
+
+                    }
+
+                    function runQuery() {
+                            
+                        var queryField = $('#queryField').val()
+                        var queryType = $('#queryType').val()
+                        var queryString = $('#queryString').val()
+
+                        var databaseId = $('#databaseSelection').val()
+
+                        datasetQueries.push({
+
+                            databaseId: databaseId,
+                            queryField:queryField,
+                            queryType: queryType,
+                            queryString: queryString
+
+                        })
+
+                        queryDatabase(databaseId, queryType, queryField, queryString, function(data){
+
+                            var chartType = 'map'
+                            var plotType = $('#plot-type').val()
+                            var latitude = $('#latitude-selection').val()
+                            var longitude = $('#longitude-selection').val()
+
+                            inputTableData(data, databaseSchema, 'results-table2')
+
+                        })
+
+                    }
+
+                </script>

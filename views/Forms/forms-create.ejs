@@ -1,0 +1,153 @@
+<% include ../partials/formsheader.ejs %>
+
+<!-- <h1>Create a New Form</h1> -->
+
+<div class="container">
+
+    <h3 style="margin-top:20px">Create a New Form</h3>
+    <div class="form-control" style="padding:20px">
+        <label for="form-name-input">Form Name </label>
+        <input class='form-control w-25' type="text" id="form-name-input">
+
+        <!-- We need the database to get the schema for which inputs to fill out -->
+        <label for="database-select-box">Select a Database</label></br>
+        <select class="custom-select w-25" id="database-select-box" onchange="updateFormValues()">
+            
+            <option>Databases</option>
+
+        </select>
+
+    </div>
+    <h3 style="margin-top:20px">Form Inputs </h3>
+    <div id='form-creation' class="form-control" style="padding:20px">
+
+        <h5>No Inputs Yet</h5>
+
+    </div>
+
+</div>
+
+
+<script src="/modules/DatabaseScripts/databaseFunctions.js"></script>
+<script>
+
+    var databaseSchemaG;
+
+    populateDatabaseSelection('database-select-box', function(){
+
+    })
+
+    function updateFormValues() {
+
+        var databaseId = $('#database-select-box').val()
+
+        getDatabaseSchema(databaseId, function(databaseSchema){
+            databaseSchemaG = databaseSchema
+            inputFormInputs(databaseSchema, 'form-creation')
+
+        })
+
+    }
+
+    function inputFormInputs(databaseSchema, divId){
+
+        var inputString = ``
+
+        $(`#${divId}`).empty()
+
+        for(var i = 0; i < Object.keys(databaseSchema).length; i++){
+
+            inputString += `<div id='${Object.keys(databaseSchema)[i]}-div'><h4 style='margin-top:20px'> ${Object.keys(databaseSchema)[i]}</h4>`
+            inputString += `<label>Input Type</label> `
+            inputString += `<select class="question-datatype" onchange="checkValue(this.value, '${Object.keys(databaseSchema)[i]}-div')">
+                <option value="text">Text</option>
+                <option value="select">Select Box</option>
+                <option value="url">Url</option>
+                <option value="email">Email</option>
+                <option value="number">Number</option>
+                <option value="range">Range</option>
+                <option value="date">Date</option>
+                <option value="time">Time</option>
+                <option value="color">Colour</option>
+                <option value="map">Map</option>
+                </select></br>`
+            inputString += `<label>Question prompt for ${Object.keys(databaseSchema)[i]}</label>`
+            inputString += `<input type='text' class='form-control w-25 question-prompt'></div>`
+
+        }
+
+        inputString += `<button style='margin-top:20px' class='btn btn-sm btn-primary' onclick='createForm()'>Create Form</button>`
+
+        $(`#${divId}`).append(inputString)
+
+    }
+
+    function checkValue(value, divName){
+
+        if(value == 'select'){
+
+            //add select box options input
+            $('#'+divName).append(`<label class='selectBoxOptions'>Select Box Options</label><input class='form-control w-25 selectBoxOptions' type='text'>`)
+
+        } else {
+
+            $('.selectBoxOptions').remove()
+        }
+
+    }
+
+    function createForm(){
+
+        //Get all the values to create a new form
+
+        var questionObjectArray = []
+
+        if($('#form-name-input').val() == ''){
+
+            alert('Please give your form a name!')
+
+            return 0
+
+        }
+
+        for(var i = 0; i < $('.question-datatype').length; i++){
+
+            var questionObject ={
+                
+                dataField: Object.keys(databaseSchemaG)[i],
+                questionDatatype:$($('.question-datatype')[i]).val(),
+                questionPrompt:$($('.question-prompt')[i]).val()
+
+            }
+
+            questionObjectArray.push(questionObject)
+
+        }
+
+        //Ajax route to create a new form
+
+        $.post({
+            type:'POST',
+            url:'/forms/create',
+            data: {
+                databaseId: $('#database-select-box').val(),
+                formName: $('#form-name-input').val(),
+                questionArray: JSON.stringify(questionObjectArray)
+            },
+            success: function(){
+
+                location.href = '/forms/usersForms'
+
+            }
+        })
+
+
+    }
+
+</script>
+
+
+
+<!-- Forms will be created using the certain data types -->
+
+<% include ../partials/footer.ejs %>

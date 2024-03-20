@@ -1,0 +1,67 @@
+<% include ../partials/chartheader.ejs %>
+    <div class="" style="position: relative;width:50%;margin: 0 auto;">
+        <h1 style="margin-bottom:30px">
+            <%= ticket.ticketName %>
+        </h1>
+        <a href="/tickets/users-tickets" >Back to tickets</a></br>
+        <em>Created on: <%= ticket.dateTime %></em></br>
+        <em>Complete By: <%= ticket.ticketDeadline %></em>
+        <div class="form-control" style="margin-top:30px;padding:25px">
+
+            <p> <%- ticket.ticketDetail %></p>
+            <% if(ticket.ticketCompleted == true){ %>
+                <button class="btn btn-primary btn-sm" onclick="uncompleteTicket('<%= ticket.recordId %>')">Uncomplete</button>
+            <% } else { %>
+                <button class="btn btn-primary btn-sm" onclick="completeTicket('<%= ticket.recordId %>')">Complete</button>
+            <% } %>
+            <button class="btn btn-primary btn-sm">Add Comment</button>
+            <button class="btn btn-primary btn-sm" onclick="editTicket('<%= ticket.recordId %>')">edit</button>
+        </div>
+
+        <script src="/modules/TicketScripts/ticketFunctions.js"></script>
+        <script>
+
+            function editTicket(ticketId){
+
+                location.href=`/tickets/edit/${ticketId}`                
+
+            }
+
+            function uncompleteTicket(ticketId){
+
+                $.post(
+                        url='/tickets/uncomplete',
+                        data= {
+                            ticketId: ticketId,
+                        },
+                        success= function(){
+
+                            location.href=`/tickets/view/${ticketId}`
+
+                        }
+                )
+
+            }
+
+            function completeTicket(ticketId){
+
+                $.post(
+                        url='/tickets/complete',
+                        data= {
+                            ticketId: ticketId,
+                        },
+                        success= function(){
+
+                            location.href=`/tickets/view/${ticketId}`
+
+                        }
+                )
+
+
+            }
+
+        </script>
+
+    </div>
+
+    <% include ../partials/footer.ejs %>

@@ -1,0 +1,42 @@
+<% include ../partials/databaseheader.ejs %>
+
+    <div class="container">
+
+
+        <% include ../Chart/map-template %>
+            <div class="jumbotron">
+
+                <h3>Latitude</h3>
+                <input type="text" id="lat" class="form-control w-25">
+                <h3>Longitude</h3>
+                <input type="text" id="long" class="form-control w-25">
+
+            </div>
+
+            <script src="/modules/ChartScripts/mapFunctions.js"></script>
+            <script>
+
+                var coordinateMarker = L.marker([0, 0], { clickable: true }).addTo(map);
+
+
+                map.on('click', function (e) {
+
+                    console.log(e.latlng)
+
+                    var newLatLong = new L.LatLng(e.latlng['lat'], e.latlng['lng'])
+
+                    coordinateMarker.setLatLng(newLatLong)
+
+                    //Set the outputs lat and long to the new coordinates
+
+                    $('#lat').val(e.latlng['lat'])
+                    $('#long').val(e.latlng['lng'])
+                    
+                })
+
+
+            </script>
+
+    </div>
+
+    <% include ../partials/footer.ejs %>

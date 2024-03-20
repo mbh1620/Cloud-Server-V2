@@ -1,0 +1,85 @@
+<% include ./partials/workflowsheader.ejs %>
+<head>
+    <link rel="stylesheet" href="../prism.css">
+</head>
+
+<div class="container" style="position: relative;">
+    <h1>Create a new Text file</h1>
+    
+
+
+    <button class='btn btn-light btn-md' onclick="saveTextFile('<%= currentUser.name %>')" style="margin-top:20px">Save</button>
+
+    <div class="dropdown">
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#">Python 3.9</a>
+          <a class="dropdown-item" href="#">JavaScript</a>
+        </div>
+    </div>
+    <input style="" type="text" id="nameBox" class="namebox form-control w-50" placeholder="File Name"
+        aria-label="Example text with button addon" aria-describedby="button-addon1">
+
+    <textarea id="codeInput" spellcheck="false"></textarea>
+    
+</div>
+    
+<script src="../prism.js"></script>
+<script>
+    var x = 23
+    var y = 600
+    function update(text){
+        console.log()
+        var element = document.querySelector("#codeDisplay")
+        element.innerHTML = text;
+        Prism.highlightElement(element)
+        if(text[text.length-1] == '\n'){
+            console.log("Return pressed")
+            var lines = element.innerHTML.split(/\r*\n/)
+            var lineCount = lines.length;
+            if(lineCount >= x){
+                x += 10
+                y += 280
+                $('#codeInput, #Highlighting').css("height", y+'px')
+            }   
+        }  
+    }
+
+</script>
+<style>
+
+    #codeInput {
+        margin-top:30px;
+        height: 100%;
+        width: 100%;
+        border: none;
+        background-color: rgb(240, 240, 240);
+        font-size: 14pt;
+        font-family: monospace;
+        line-height: 20pt;
+    }
+
+</style>
+<script>
+    console.log('<%= path %>')
+    function saveTextFile(user){
+        var textFileName = $("#nameBox").val()
+        var textFileContent = $("#codeInput").val()
+        var filePath = '<%= path %>'
+    
+        //Send a request to create a new file or save exisiting file
+        $.ajax({
+            type:'POST',
+            url: '/text/save',
+            data: {
+                name: textFileName,
+                content: textFileContent,
+                currentPath: filePath,
+            },
+            success: function(){
+                console.log("Saved Successfully");
+            },
+            dataType: 'JSON'
+        })
+    }
+</script>
+<% include ./partials/footer.ejs %>

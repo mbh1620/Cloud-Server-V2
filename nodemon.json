@@ -1,0 +1,3 @@
+{
+    "ignore": ["public/*/Workflows/*.json", "public/*/Database/*.json", "modules/*", "*.json", "public/*"]
+}

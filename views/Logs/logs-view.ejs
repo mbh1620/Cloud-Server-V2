@@ -1,0 +1,33 @@
+<% include ../partials/logheader.ejs %>
+<div class="container" style="position: relative;">
+    
+    <div class="form-control" style="width:100%;margin-top:30px;overflow-x: scroll;">
+    <h3>Logs</h3>
+    </div>
+    <% for(var i = 0; i < logRecords.length; i++){ %>
+
+        <li id="<%= i %>" class="list-group-item"><a href="#" onclick=""><%= logRecords[i].Name %></a><p style="float:right"><%= logRecords[i].dateTime %></p></li>
+    
+    <% } %>
+    
+    <table id="results-table" style="width:100%;">
+    </table>
+    <style>
+        td {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 12;
+        }
+
+        th, td {
+            border: 1px solid black;
+        }
+    </style>    
+</form>
+</div>
+
+<script>
+</script>
+    
+
+<% include ../partials/footer.ejs %>

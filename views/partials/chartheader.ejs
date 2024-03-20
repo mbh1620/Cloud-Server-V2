@@ -1,0 +1,37 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+     crossorigin=""/>
+    <!-- <link rel="stylesheet" href="../style.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/91c704b5fe.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.9/css/mdb.min.css" rel="stylesheet"> -->
+    </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <a style="font-size:30;" class="navbar-brand" href="/"><i class="fas fa-chart-bar"></i> Chart</a>
+            <div class="form-inline">
+                <% if (!currentUser){ %>
+                    
+            <form class="form-inline my-2 my-lg-0" action="/register">
+                <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Sign up</button>
+            </form>
+            <form class="form-inline my-2 my-lg-0" action="/login">
+                <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Login</button>
+            </form>
+            <%} else { %>
+                <p style="margin-top:10px;margin-right:20px">Logged in as <em style="color:blue"><%= currentUser.name %></em></p>
+                <form class="form-inline my-2 my-lg-0" action="/logout?_method=DELETE" method="POST">
+                <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Logout</button>
+            </form>
+            </div>
+            <% } %>
+        
+    </nav>

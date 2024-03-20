@@ -1,0 +1,167 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <!-- <link rel="stylesheet" href="../style.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/91c704b5fe.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<body>
+
+    <div id="question-container" class="container">
+        <div class="form-control bg-light" style="margin-top:40px;padding:40px">
+            <h3>
+                <%= form.formName %>
+            </h3>
+            <div style="width:35%;margin: 0 auto" id="form-container"></div>
+        </div>
+    </div>
+
+</body>
+<script src="/modules/FormScripts/formFunctions.js"></script>
+<script src="/modules/DatabaseScripts/databaseFunctions.js"></script>
+<script>
+
+    var formId = '<%= form.recordId %>'
+    var formDataG;
+
+    function populateFormQuestions(formId) {
+
+        getForm(formId, function (formData) {
+
+            formDataG = formData
+
+            for (var i = 0; i < formData.questionArray.length; i++) {
+
+                inputQuestionIntoForm(formData.questionArray[i])
+
+            }
+
+            var appendString = '<button class="btn btn-primary btn-sm" onclick="collectFormDataForSubmission()" style="margin-top:30px">Submit</button>'
+
+            $('#form-container').append(appendString)
+
+        })
+
+    }
+
+    function inputQuestionIntoForm(questionDataObject) {
+
+        var inputType = ''
+        var cssClass = 'form-control'
+
+        switch (questionDataObject.questionDatatype) {
+
+            case 'text':
+                inputType = 'text'
+                break;
+            case 'url':
+                inputType = 'url'
+                break;
+            case 'email':
+                inputType = 'email'
+                break;
+            case 'number':
+                inputType = 'number'
+                break;
+            case 'range':
+                inputType = 'range'
+                break;
+            case 'date':
+                inputType = 'date'
+                break;
+            case 'time':
+                inputType = 'time'
+                break;
+            case 'color':
+                inputType = 'color'
+                cssClass = ''
+                break;
+            case 'map':
+                break;
+        }
+
+        var appendString = `
+        <label style='margin-top:20px'>${questionDataObject.questionPrompt}</label>
+        <input class='${cssClass} formInput' style="display:block" type='${inputType}'>`
+
+        $('#form-container').append(appendString)
+
+    }
+
+    populateFormQuestions(formId)
+
+    function collectFormDataForSubmission() {
+
+        //Gather all values and submit
+
+        var values = {}
+
+        for (var i = 0; i < $('.formInput').length; i++) {
+
+            switch (formDataG.questionArray[i]['questionDatatype']) {
+
+                case 'text':
+                    values[formDataG.questionArray[i]['dataField']] = $($('.formInput')[i]).val()
+                    break;
+                case 'url':
+                    values[formDataG.questionArray[i]['dataField']] = $($('.formInput')[i]).val()
+                    break;
+                case 'email':
+                    values[formDataG.questionArray[i]['dataField']] = $($('.formInput')[i]).val()
+                    break;
+                case 'number':
+                    values[formDataG.questionArray[i]['dataField']] = parseFloat($($('.formInput')[i]).val())
+                    break;
+                case 'range':
+                    values[formDataG.questionArray[i]['dataField']] = $($('.formInput')[i]).val()
+                    break;
+                case 'date':
+                    values[formDataG.questionArray[i]['dataField']] = $($('.formInput')[i]).val()
+                    break;
+                case 'time':
+                    values[formDataG.questionArray[i]['dataField']] = $($('.formInput')[i]).val()
+                    break;
+                case 'color':
+                    values[formDataG.questionArray[i]['dataField']] = $($('.formInput')[i]).val()
+                    break;
+                case 'map':
+                    break;
+            }
+
+
+        }
+
+        console.log(values)
+
+        submitForm(formDataG.databaseId, values, function(){
+
+            location.href = '/forms/success'
+
+        })
+
+    }
+
+    function submitForm(databaseId, record, successCallback) {
+
+        console.log(record)
+
+        $.post(
+            url = "/forms/submit/",
+            data = { 
+                databaseId: databaseId,
+                formSubmission: JSON.stringify(record)
+            },
+            success = successCallback
+        )
+
+    }
+
+</script>
+
+</html>

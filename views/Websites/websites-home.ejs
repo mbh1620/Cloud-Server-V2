@@ -1,0 +1,17 @@
+<% include ../partials/workflowsheader.ejs %>
+
+<div class="container">
+<h1>Websites</h1>
+<p>Create, Edit and Host static websites. Upload applications and deploy.</p>
+<% if(!currentUser){ %>
+
+<% } else { %>
+    
+    <button class="btn btn-md btn-light" onclick="window.location.href='/websites/users-websites'">My Websites</button>
+    <button class="btn btn-md btn-light" onclick="window.location.href='/usersworkflows/<%=currentUser.name%>'">My Deployments</button>
+    <button class="btn btn-md btn-light" onclick="window.location.href='/workflows/settings'">Settings</button>
+<% } %>
+</div>
+
+
+<% include ../partials/footer.ejs %>

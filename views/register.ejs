@@ -1,0 +1,25 @@
+<% include ./partials/header.ejs %>
+<div class="container">
+   <div class="jumbotron">
+       <div style="width:50%;height:auto;margin: 0 auto">
+<h1>Register an Account</h1>
+
+<form action="/register" method="POST" >
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input class="form-control" type="text" name="name" placeholder="Enter name" id="name">
+    </div>
+    <div class="form-group">
+        <label for="email">Email Address</label>
+        <input class="form-control" style="margin-bottom:20px" type="email" name="email" placeholder="Enter email" id="Email">
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+    <input class="form-control" style="margin-bottom:20px" type="password" name="password" placeholder="Enter password" id="password">
+    <button class="btn btn-primary" style="margin-bottom:20px;" type="submit">Submit</button>
+    </div>
+</form>
+</div>
+</div>
+</div> 
+<% include ./partials/footer.ejs %>

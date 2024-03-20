@@ -1,0 +1,194 @@
+<% include ../partials/databaseheader.ejs %>
+<div class="container" style="position: relative;">
+    
+    <h4 style="margin-top:20px">Query Database</h4>
+    <div class="form-control" style="width:100%;height:350px">
+
+    <h3><%=database.dbName%></h3>
+    
+    <label>Select Field to Query Against</label>
+    <select class="form-control w-25" id="queryField">
+        <option>recordId</option>
+        <option>timeStamp</option>
+    </select>
+    <label for="">Query type: </label>
+    <select class="form-control w-25" id="queryType" onchange="changeForm()">
+        <option>String Match</option>
+        <option>String Contains</option>
+        <option>String Match (not Case Sensitive)</option>
+        <option value="Inbetween">Inbetween</option>
+        <option>Larger than</option>
+        <option>Less than</option>
+    </select>
+    <label>Query String</label>
+    <input class="form-control w-25" type="text" name="queryString" id="queryString">
+    <label style="display:none" id="lowerLabel">Lower:</label>
+    <input class="form-control w-25" type="text" name="lowerQueryString" id="lowerQueryString" style="display:none">
+    <label style="display:none" id="upperLabel">Query String Upper:</label>
+    <input class="form-control w-25" type="text" name="upperQueryString" id="upperQueryString" style="display:none">
+    <button  style="margin-top:30px;float:right" class="btn btn-primary" onclick="runQuery('<%=database.databaseId%>')">Run Query</button>
+    </div>
+
+    <h3 style="margin-top:20px">Results</h3>
+    <label>Query Time: <span id="queryTime"></span></label></br>
+    <label>Records: <span id="recordCount"></span></label>
+    <div class="form-control" style="width:100%;height:auto;min-height:200px;max-height:700px;margin-top:20px;overflow-x: scroll;overflow-y: scroll;">
+
+    <table id="results-table" style="width:100%;">
+    </table>
+    <style>
+        #results-table td {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 12;
+        }
+
+        #results-table th, td {
+            border: 1px solid black;
+        }
+    </style>
+    </div>
+</form>
+</div>
+<script src="/modules/DatabaseScripts/databaseFunctions.js"></script>
+<script>
+
+getFields('<%=database.databaseId%>', function(data){
+    console.log(data)
+    updateSelectionBox(data)
+})
+
+var dataFields;
+var schema;
+
+getDatabaseSchema('<%=database.databaseId%>', function(data){
+    dataFields = Object.keys(data);
+    schema = data
+})
+
+function changeForm(){
+    if($('#queryType').val() == "Inbetween"){
+        //change form to include two range boxes
+        $('#lowerQueryString').show()
+        $('#upperQueryString').show()
+        $('#lowerLabel').show()
+        $('#upperLabel').show()
+        $('#queryString').hide()
+    } else {
+        $('#lowerQueryString').hide()
+        $('#upperQueryString').hide()
+        $('#lowerQueryString').val("")
+        $('#upperQueryString').val("")
+        $('#lowerLabel').hide()
+        $('#upperLabel').hide()
+        $('#queryString').show()
+    }
+}
+
+function updateSelectionBox(receivedFields){
+
+    $('#queryField').empty()
+    var string = ''
+    for(var i = 0; i < receivedFields.length; i++){
+        string += '<option>' + receivedFields[i] + '</option>'
+    }
+
+    string += '<option>recordId</option>'
+    string += '<option>dateTime</option>'
+    
+    $('#queryField').append(string)
+
+}
+
+function runQuery(databaseId){
+
+    console.log(databaseId)
+    
+    var queryString = $('#queryString').val()
+    var queryField = $('#queryField').val()
+    var queryType = $('#queryType').val()
+
+    queryDatabase(databaseId, queryType, queryField, queryString, function(receivedData){
+
+        updateResultBox(receivedData.record)
+        updateQueryTime(receivedData.queryTime, receivedData.recordCount)
+
+    })
+}
+
+function updateQueryTime(queryTime, recordCount){
+
+    $('#queryTime').html(queryTime)
+    $('#recordCount').html(recordCount)
+    
+}
+
+function updateResultBox(data){
+
+    $("#results-table").empty()
+
+    console.log(data)
+
+    var string = '<tr>'
+
+    dataColumns = []
+    
+    if(!dataFields.includes('recordId')){
+        dataFields.push('recordId')
+    }
+
+    if(!dataFields.includes('dateTime')){
+        dataFields.push('dateTime')
+    }
+    
+    for(var i = 0; i < dataFields.length; i++){   //Change this here
+        
+        string += '<th>' + dataFields[i] + '</th>'
+        dataColumns.push(dataFields[i]);
+
+    }
+
+    string += '</tr>'
+    $("#results-table").append(string)
+
+    for(var i = 0; i < data.length; i++){
+        var string = '<tr>'
+        var x = 0
+        var flag;
+        
+        for(var z = 0; z < dataColumns.length; z++){
+
+            if(Object.keys(data[i]).includes(dataColumns[z])){
+
+                if(schema[dataColumns[z]] == 'fileLink'){
+
+                    string += '<td><a target="_blank" href="'+data[i][dataColumns[z]]+'" >' + data[i][dataColumns[z]] + '</a></td>'
+
+                } else if (schema[dataColumns[z]] == 'photo'){
+
+                    string += '<td><a target="_blank" href="'+data[i][dataColumns[z]]+'" ><img style="width:150px;height:auto" src="'+data[i][dataColumns[z]]+'" ></a>'
+
+                } else {
+
+                    string += '<td>' + data[i][dataColumns[z]] + '</td>'
+
+                }
+
+            } else {
+
+                string += '<td>Undefined</td>'
+                
+            }
+        }
+
+        string += '</tr>'
+        $("#results-table").append(string)
+    }
+
+    $('#resultBox').val(JSON.stringify(data))
+}
+
+</script>
+    
+
+<% include ../partials/footer.ejs %>

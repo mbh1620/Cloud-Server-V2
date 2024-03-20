@@ -1,0 +1,222 @@
+<% include ../partials/chartheader.ejs %>
+
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+            integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    </head>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+    <script src='/modules/ChartScripts/mapView.js'></script>
+    <script src='/modules/DatabaseScripts/databaseFunctions.js'></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src='/modules/ChartScripts/chartFunctions.js'></script>
+    <script src='/modules/ChartScripts/mapFunctions.js'></script>
+    <script src='/modules/ChartScripts/tableFunctions.js'></script>
+
+    <!-- For adding charts over maps check https://developers.arcgis.com/esri-leaflet/samples/dynamic-chart/ -->
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+    <script>
+        var charts = []
+
+        var dashboardName = '<%=dashboard.dashboardName%>'
+
+        getDashboard('<%=dashboard.recordId%>', '<%= dashboardsDatabaseId %>', function (returnedDashboard) {
+
+            //Create the Layout using the details
+
+            console.log(returnedDashboard)
+
+            var string = ``
+
+            for (var i = 0; i < returnedDashboard.record[0]['layout'].length; i++) {
+
+                for (var j = 0; j < returnedDashboard.record[0]['layout'][i]; j++) {
+
+                    string += `<div class="form-control element" style="overflow-y:scroll;float:left;height:${(100/returnedDashboard.record[0]['layout'].length)}vh;width:${(1 / returnedDashboard.record[0]['layout'][i]) * 100}%"></div>`
+
+                }
+
+            }
+
+            $('body').append(string)
+
+            returnedDashboard.record[0]['chartValues'].forEach(function (currentValue, index) {
+
+                getChart(currentValue, '<%= chartsDatabaseId %>', function (chartData) {
+
+                    var item = $('.element').get(index)
+
+                    $(item).html(generateChartString(chartData.record[0]['chartType'], index))
+
+                    populateChartElements(chartData, item, index)
+                })
+            })
+        })
+
+        function generateChartString(chartType, index) {
+
+            var string = ""
+
+            switch (chartType) {
+
+                case 'map':
+                    //Import the map template
+
+                    string += `<div id="map-${index}" class="map-container" style="height:100%;width:100%"></div>`
+                    break;
+                case 'table':
+                    //Import the table template
+
+                    string += `<table id="table-${index}" class="table table-striped table-bordered" style="width:100%;"></table>`
+                    break;
+                default:
+                    //Import the chart template
+
+                    string += `<canvas class="chart" id="chart-${index}" style="margin:0 auto;height:100%;width:100%"></canvas>`
+                    break;
+            }
+
+            return string
+
+        }
+
+        function populateChartElements(chartData, iframeElement, index) {
+
+            //Change the Id of the element in the iframe then populate using the chart queries etc
+
+            var chartType = chartData.record[0]['chartType']
+
+            switch (chartType) {
+
+                case 'map':
+                    //Import the map template
+
+                    var id = 'map-' + index
+
+                    //create a map
+                    var map = L.map(id).setView([51.505, -0.09], 13);
+
+                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
+
+                    var databaseId = chartData.record[0].datasetQueries[0]['databaseId']
+                    var queryType = chartData.record[0].datasetQueries[0]['queryType']
+                    var queryField = chartData.record[0].datasetQueries[0]['queryField']
+                    var queryString = chartData.record[0].datasetQueries[0]['queryString']
+
+                    var plotType = chartData.record[0].datasetQueries[0]['plotType']
+
+                    queryDatabase(databaseId, queryType, queryField, queryString, function (data) {
+
+                        var latitudeSelection = chartData.record[0].datasetQueries[0]['latitudeSelection']
+                        var longitudeSelection = chartData.record[0].datasetQueries[0]['longitudeSelection']
+
+                        var popupContentField = chartData.record[0].datasetQueries[0]['popupContentField']
+
+                        map = populateMap(latitudeSelection, longitudeSelection, plotType, data, map, popupContentField)
+
+                        for (var i = 1; i < chartData.record[0].datasetQueries.length; i++) {
+
+                            var latitudeSelection = chartData.record[0].datasetQueries[i]['latitudeSelection']
+                            var longitudeSelection = chartData.record[0].datasetQueries[i]['longitudeSelection']
+
+                            var databaseId = chartData.record[0].datasetQueries[i]['databaseId']
+                            var queryType = chartData.record[0].datasetQueries[i]['queryType']
+                            var queryField = chartData.record[0].datasetQueries[i]['queryField']
+                            var queryString = chartData.record[0].datasetQueries[i]['queryString']
+                            var popupContentField = chartData.record[0].datasetQueries[i]['popupContentField']
+
+                            plotType = chartData.record[0].datasetQueries[i]['plotType']
+
+                            queryDatabase(databaseId, queryType, queryField, queryString, function (data) {
+
+                                populateMap(latitudeSelection, longitudeSelection, plotType, data, map, popupContentField)
+
+                            })
+                        }
+                    })
+
+                    break;
+                case 'table':
+                    //Import the table template
+
+                    var id = 'table-' + index
+
+                    var databaseName = chartData.record[0].datasetQueries[0]['databaseId']
+                    var queryType = chartData.record[0].datasetQueries[0]['queryType']
+                    var queryField = chartData.record[0].datasetQueries[0]['queryField']
+                    var queryString = chartData.record[0].datasetQueries[0]['queryString']
+
+                    queryDatabase(databaseName, queryType, queryField, queryString, function (data) {
+
+                        getDatabaseSchema(databaseName, function (dataSchema) {
+
+                            inputTableData(data, dataSchema, id)
+
+                        })
+
+                    })
+
+                    break;
+                default:
+                    var id = 'chart-' + index
+                    var chartElement = $('#' + id)
+
+                    var databaseId = chartData.record[0].datasetQueries[0]['databaseId']
+                    var queryType = chartData.record[0].datasetQueries[0]['queryType']
+                    var queryField = chartData.record[0].datasetQueries[0]['queryField']
+                    var queryString = chartData.record[0].datasetQueries[0]['queryString']
+
+                    queryDatabase(databaseId, queryType, queryField, queryString, function (data) {
+
+                        var chartType = chartData.record[0]['chartType']
+                        var xAxisField = chartData.record[0]['xAxis']
+                        var yAxisField = chartData.record[0]['yAxis']
+
+                        var preparedData = prepareData(data, xAxisField, yAxisField)
+
+                        getDatabaseSchema(databaseId, function (dataSchema) {
+
+                            var localChart;
+
+                            chart = populateChart(chartElement, 'testChart1', chartType, xAxisField, yAxisField, preparedData, dataSchema)
+
+                            localChart = chart
+
+                            charts.push(localChart)
+
+                            for (var i = 1; i < chartData.record[0].datasetQueries.length; i++) {
+
+                                var databaseId = chartData.record[0].datasetQueries[i]['databaseId']
+                                var queryType = chartData.record[0].datasetQueries[i]['queryType']
+                                var queryField = chartData.record[0].datasetQueries[i]['queryField']
+                                var queryString = chartData.record[0].datasetQueries[i]['queryString']
+
+                                queryDatabase(databaseId, queryType, queryField, queryString, function (data) {
+
+                                    var chartType = chartData.record[0]['chartType']
+                                    var xAxisField = chartData.record[0]['xAxis']
+                                    var yAxisField = chartData.record[0]['yAxis']
+
+                                    var preparedData = prepareData(data, xAxisField, yAxisField)
+
+                                    localChart = addNewDataSetToChart(localChart, chartType, preparedData, xAxisField, dataSchema)
+
+                                })
+                            }
+                        })
+                    })
+                    break;
+            }
+        }
+
+    </script>
+
+    <% include ../partials/footer.ejs %>

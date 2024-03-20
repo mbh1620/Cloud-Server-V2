@@ -1,0 +1,17 @@
+<% include ../partials/databaseheader.ejs %>
+
+<div class="container">
+<h1>Forms</h1>
+<p>Create User Facing Forms To Collect Data</p>
+<% if(!currentUser){ %>
+
+<% } else { %>
+    
+    <button class="btn btn-md btn-light" onclick="window.location.href='/forms/usersForms'">Forms</button>
+    <button class="btn btn-md btn-light" onclick="window.location.href='/forms/settings'">Settings</button>    
+
+<% } %>
+
+</div>
+
+<% include ../partials/footer.ejs %>

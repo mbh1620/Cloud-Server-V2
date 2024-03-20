@@ -1,0 +1,180 @@
+<% include ./partials/workflowsheader.ejs %>
+<head>
+    <link rel="stylesheet" href="../modules/prism.css">
+</head>
+
+<div class="container" style="position: relative;">
+    <h1>Create a new Workflow</h1>
+    
+<textarea id="codeInput" spellcheck="false" oninput="update(this.value);" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;update(this.value);return false;}"></textarea>
+
+<pre id="highlighting">
+<code id="codeDisplay" class="language-python" style="overflow: scroll;">
+</code>
+</pre>
+
+
+    <button class='btn btn-light btn-md' onclick="saveWorkflow('<%= currentUser.name %>', '<%= currentUser.id %>')" style="margin-top:20px">Save</button>
+    <button class='btn btn-light btn-md' style="margin-top:20px;margin-left:-5px">Edit</button>
+    <button class='btn btn-primary btn-md' onclick="runWorkflow('<%= currentUser.name %>')" style="margin-top:20px;margin-left:-5px">Test</button>
+
+    <div class="dropdown">
+        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Language
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#">Python 3.9</a>
+          <a class="dropdown-item" href="#">JavaScript</a>
+        </div>
+    </div>
+    <input style="" type="text" id="nameBox" class="namebox form-control w-50" placeholder="Workflow Name"
+        aria-label="Example text with button addon" aria-describedby="button-addon1">
+
+    <h4 style="margin-top:20px">Workflow Configuration</h4>
+    <div class="form-control" style="width:100%">
+
+    <label for="scheduleInput">Triggered by event</label>
+    <select>
+        <option value="">No Trigger</option>
+        <option value="">Trigger 1</option>
+        <option value="">Trigger 2</option>
+        <option value="">Trigger 3</option>
+    </select><button class="btn btn-sm btn-sm" onclick="location.href='/events/create'">Create New Trigger</button></br>
+    <label for="scheduleInput">Schedule</label>
+    <input id="scheduleInput" type="number" placeholder="Schedule" class="form-control w-25"> exectutes every n minutes </br>
+    <label for="timeoutInput">Timeout</label>
+    <input id="timeoutInput" type="number" placeholder="Timeout" class="form-control w-25"> times out after n seconds </br>
+    <label for="envVars">Arguments: </label>
+    <textarea class="form-control" rows=5 id="args">{
+        "[argument1]",
+}</textarea>
+    <label for="envVars">Environment Variables: </label>
+    <textarea class="form-control" rows=5 id="envVars">{
+    "[variablesName]":"[variableValue]"    
+}</textarea>
+    </div>
+    
+    <h4 style="margin-top:20px">Console Output</h4>
+    <div id="Output" class="form-control" style="width:100%;height:250px;overflow: scroll;">
+<pre><textarea style="width:100%;height:200px;border:none;font-size: 20px;overflow: scroll;white-space: pre-wrap;"></textarea></pre>
+    </div>
+    
+    
+</div>
+    
+<script src="../modules/prism.js"></script>
+<script>
+    var x = 23
+    var y = 600
+    function update(text){
+        console.log()
+        text = text.replace(/\</g,"&lt;");
+        var element = document.querySelector("#codeDisplay")
+        element.innerHTML = text;
+        Prism.highlightElement(element)
+        if(text[text.length-1] == '\n'){
+            console.log("Return pressed")
+            var lines = element.innerHTML.split(/\r*\n/)
+            var lineCount = lines.length;
+            if(lineCount >= x){
+                x += 10
+                y += 280
+                $('#codeInput, #Highlighting').css("height", y+'px')
+            }   
+        }  
+    }
+</script>
+<style>
+
+    #codeInput, #highlighting{
+        margin: 10px;
+        margin-top:40px;
+        padding: 10px;
+        border: 0;
+        width: 100%;
+        height: 644px;
+        tab-size: 4;
+    }
+
+    #codeInput, #highlighting, #highlighting * {
+        font-size: 14pt;
+        font-family: monospace;
+        line-height: 20pt;
+    }
+
+    #codeInput, #highlighting {
+        position: absolute;
+        top:1100px;
+        left:0;
+        margin:0;
+        margin-top: 30px
+    }
+
+    #codeInput {
+        z-index: 1;
+    }
+
+    #highlighting {
+        z-index: 0;
+    }
+
+    #codeInput {
+        color: transparent;
+        background: transparent;
+        caret-color: grey;
+    }
+
+</style>
+<script>
+    function saveWorkflow(user, userId){
+        var workflowName = $("#nameBox").val()
+        var workflowContent = $("#codeInput").val()
+        var schedule = $("#scheduleInput").val()
+        var args = $('#args').val()
+        var envVars = $("#envVars").val()
+
+        //Send a request to create a new file or save exisiting file
+        $.ajax({
+            type:'POST',
+            url: '/workflows/save',
+            data: {
+                name: workflowName,
+                content: workflowContent,
+                user: user,
+                schedule: schedule,
+                envVars: envVars,
+                args: args
+            },
+            success: function(){
+                console.log("Saved Successfully");
+                location.href = '/usersworkflows/<%= currentUser.name %>'
+            }
+        })
+    }
+
+    function runWorkflow(user){
+        
+        var Workflow = {}
+        Workflow.name = $('#nameBox').val(),
+        Workflow.directory = $('#directoryInput').val(),
+        Workflow.schedule = $('#scheduleInput').val(),
+        Workflow.env = [],
+        Workflow.args = [],
+        Workflow.timeout = $('#timeoutInput').val()
+        
+        $.ajax({
+            type:"POST",
+            url:'/workflows/test',
+            data:{
+                workflow: JSON.stringify(Workflow),
+                currentUser: user
+            },
+            success: function(data){
+                console.log(data)
+                $('#Output').html(data)
+            }
+        })
+
+    }
+</script>
+<% include ./partials/footer.ejs %>

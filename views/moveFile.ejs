@@ -1,0 +1,82 @@
+<% include ./partials/header.ejs %>
+
+  <div class="container" style="margin-top:100px">
+    <div class="jumbotron">
+      <h3>Move File/Folder</h3>
+      <p>from: <%= path %>/<%= fileName %>
+      </p>
+      <p>To: </p>
+      <div class="form-group">
+        <nav aria-label="breadcrumb">
+          <ol id="breadcrumblist" class="breadcrumb bg-light">
+            <li class="breadcrumb-item item active" aria-current="page"><a href="#" id="homeDirectoryButton"
+              onclick="homeDirectory()"><i class="fas fa-folder"></i></a></li>
+          </ol>
+        </nav>
+
+        <!-- File upload input -->
+        <div id="drop-area">
+          <form id="fileuploadform" class="my-form" action="/uploadfile" method="POST" enctype="multipart/form-data">
+            <p id="drag-label">Drag files here to upload</p>
+            <i style="display:block;font-size:30;margin-bottom:30px;margin-top: 30px" class="fas fa-upload"></i>
+            <input type="file" name="fileElem" id="fileElem" multiple onchange="handleFiles(this.files)">
+            <label class="button" for="fileElem">Select some files</label>
+            <progress id="progress-bar" max=100 value=0></progress>
+          </form>
+        </div>
+
+        <ul id="list" class="list-group" style="max-height: 500px; overflow: scroll;">
+
+          <% for (var i=0; i< files.length; i++) { %>
+            <li id="<%= i %>" class="list-group-item" onclick="updateDirectory('<%= files[i]%>')"><a href="#">
+                <%= files[i] %>
+              </a>
+            </li>
+            <% } %>
+
+
+        </ul>
+        <button class="btn btn-md btn-primary" style="float:right;margin-top:20px" onclick="moveFile()">Move
+          File</button>
+      </div>
+    </div>
+
+  </div>
+  <form style="display:none" action="/move" method="POST" id="formData">
+    <input type="hidden" name="currentPath" value="" id="formCurrentPath">
+    <input type="hidden" name="fileName" value="" id="formFileName">
+  </form>
+
+  <script type="text/javascript" src="/modules/breadCrumbScript/breadCrumb.js"></script>
+  <script type="text/javascript" src="/modules/searchDirectory/search.js"></script>
+  <script>
+
+    //Move file page
+
+    window.path = '<%= path %>'
+
+    console.log(window.path)
+    window.isEdit = false;
+
+    buildBreadcrumb(path)
+
+    searchDirectory(path, function (files) {
+      updateList(files, isEdit)
+    })
+
+    function moveFile() {
+      var oldPath = '<%= path %>/<%= fileName %>'
+      var newPath = path + '/<%= fileName %>'
+      console.log("moving file from " + oldPath + "to: " + newPath)
+      $.ajax({
+        type: "POST",
+        url: '/move/file',
+        data: { oldPath: oldPath, newPath: newPath },
+        success: function () {
+          window.location.href = "/storage/viewFiles"
+        }
+      });
+
+    }
+  </script>
+  <% include ./partials/footer.ejs %>

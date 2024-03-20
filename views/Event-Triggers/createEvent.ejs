@@ -1,0 +1,75 @@
+<% include ../partials/eventheader.ejs %>
+<div class="container" style="position: relative;">
+    <h1>Create a new Event</h1>
+    <form action="/crawler/create" method="POST">
+    <input style="margin-top:30px" type="text" id="nameBox" name="tableName" class="namebox form-control w-50" placeholder="Event Name"
+        aria-label="Example text with button addon" aria-describedby="button-addon1">
+
+    <h4 style="margin-top:20px">Choose Event Source</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">Event Source</label>
+    <select class="form-control w-25">
+        <option>Database</option>
+        <option>Files</option>
+        <option>IOT Device</option>
+        <option>Workflow</option>
+        <option>Web Crawler</option>
+        <option>File Crawler</option>
+    </select>
+    <label for="directoryInput" class="form-label">Databases</label>
+    <select class="form-control w-25">
+        <option>Database</option>
+        <option>Files</option>
+        <option>IOT Device</option>
+        <option>Workflow</option>
+        <option>Web Crawler</option>
+        <option>File Crawler</option>
+    </select>
+    </div>
+    <h4 style="margin-top:20px">Event Triggering Conditions</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">Trigger if: </label>
+    <select class="form-control w-25">
+        <option>Database</option>
+        <option>Files</option>
+        <option>IOT Device</option>
+        <option>Workflow</option>
+        <option>Web Crawler</option>
+        <option>File Crawler</option>
+    </select>
+    </div>
+    
+    <h4 style="margin-top:20px">Event Destination</h4>
+    <div class="form-control" style="width:100%">
+        <label for="directoryInput" class="form-label">Event Destination</label>
+        <select class="form-control w-25">
+            <option>Workflow</option>
+            <option>Database</option>
+            <option>Files</option>
+            <option>IOT Device</option>
+            <option>Web Crawler</option>
+            <option>File Crawler</option>
+        </select>
+        <label for="directoryInput" class="form-label">Workflow</label>
+        <select class="form-control w-25">
+            <option>Workflow 1</option>
+            <option>Workflow 2</option>
+            <option>Workflow 3</option>
+        </select>
+        <label for="directoryInput" class="form-label">Workflow environment variables and arguments</label>
+    <input style="margin-bottom:10px" type="text" id="directoryInput" class="namebox form-control w-50" value="5"
+        aria-label="Example text with button addon" aria-describedby="button-addon1" value="">
+        <label for="directoryInput" class="form-label">Schedule /minutes</label>
+    <input style="margin-bottom:10px" type="number" id="directoryInput" class="namebox form-control w-50" value="5"
+        aria-label="Example text with button addon" aria-describedby="button-addon1" value="">
+    </div>
+    <input type="hidden" value="<%= currentUser.id %>" name="userId">
+    <button  style="margin-top:30px" class="btn btn-primary">Create</button>
+</form>
+</div>
+<script>
+
+</script>
+    
+
+<% include ../partials/footer.ejs %>

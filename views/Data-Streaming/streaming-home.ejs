@@ -1,0 +1,18 @@
+<% include ../partials/header.ejs %>
+
+<div class="container">
+
+<h1>Data Streaming</h1>
+<% if(!currentUser){ %>
+
+<% } else { %>
+    
+    <button class="btn btn-md btn-light" onclick="window.location.href='/Data-Streaming/usersStreams'">My Data Streams</button>
+    <button class="btn btn-md btn-light" onclick="window.location.href='/settings'">Settings</button>
+    
+<% } %>
+
+</div>
+
+
+<% include ../partials/footer.ejs %>

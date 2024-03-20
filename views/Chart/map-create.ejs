@@ -1,0 +1,191 @@
+<% include ../partials/chartheader.ejs %>
+    <div class="container" style="position: relative;">
+        <a href="/chart/home">Back</a>
+        <h1>Create Chart (Map Data)</h1>
+        <p>Create a chart using data from a database so that the chart can then be embedded in a dashboard.</p>
+        <h4 style="margin-top:20px">Chart Name</h4>
+        <input style="margin-top:30px" type="text" id="chartName" class="namebox form-control w-50"
+            placeholder="Chart Name" aria-label="Example text with button addon" aria-describedby="button-addon1">
+
+        <h4 style="margin-top:20px">Chart Creation</h4>
+        <div class="form-control" style="width:100%">
+            <label>Chart Data Source</label>
+            <select class="form-control w-25" id="databaseSelection" onchange="changeDatabaseSelection()">
+                <option selected disabled hidden>Select Database</option>
+                <% for (var i=0; i < usersDatabases.length; i++){ %>
+                    <option value="<%= usersDatabases[i].databaseId %>">
+                        <%= usersDatabases[i].dbName %>
+                    </option>
+                    <% } %>
+            </select>
+
+        </div>
+        <h4 style="margin-top:20px" id="chartConfigTitle">Chart Configuration</h4>
+        <div class="form-control" id="chartConfig" style="width:100%">
+            <label for="directoryInput" class="form-label">Latitude</label>
+            <select class="form-control w-25 field" name="deviceType" id="latitude-selection">
+
+            </select>
+            <label for="directoryInput" class="form-label">Longitude</label>
+            <select class="form-control w-25 field" name="deviceType" id="longitude-selection">
+
+            </select>
+            <label for="directoryInput" class="form-label">Plot Type</label>
+            <select class="form-control w-25" name="plotType" id="plot-type" onchange="showPopupContentBox()">
+                <option value="single-marker">Single Marker</option>
+                <option value="poly-line">Poly-line</option>
+                <option value="polygon">Polygon</option>
+                <option value="circle">Circle</option>
+                <option value="popup">Popup</option>
+            </select>
+            <label for="directoryInput" class="form-label popupContent" style="margin-top:10px;display:none">Popup Content Field</label>
+            <select class="form-control w-25 field popupContent" name="deviceType" id="popup-content" style="display:none">
+
+            </select>
+        </div>
+        <% include ../Database/querybox-template.ejs %>
+            <% include ../Chart/map-template.ejs %>
+
+                <button class="btn btn-sm btn-primary" onclick="saveChart()">Save Chart</button>
+                <script>
+
+                    function showPopupContentBox(){
+
+                        if($('#plot-type').val() == 'popup'){
+
+                            $('.popupContent').show()
+
+                        } else {
+
+                            $('.popupContent').hide()
+
+                        }
+
+                    }
+
+                    var datasetQueries = []
+
+                    var chart;
+                    var databaseSchema;
+
+                    function changeDatabaseSelection() {
+
+                        var databaseId = $('#databaseSelection').val()
+
+                        //Query to get the field
+
+                        getDatabaseSchema(databaseId, function (data) {
+
+                            databaseSchema = data;
+
+                            var fields = Object.keys(data)
+
+                            $('.field').empty()
+                            var string = ""
+                            for (var i = 0; i < fields.length; i++) {
+                                string += "<option>" + fields[i] + "</option>"
+                            }
+
+                            string += "<option>recordId</option>"
+                            string += "<option>dateTime</option>"
+                            $('.field').append(string)
+
+                        })
+
+                    }
+
+                    function runQuery() {
+
+                        var queryField = $('#queryField').val()
+                        var queryType = $('#queryType').val()
+                        var queryString = $('#queryString').val()
+                        var plotType = $('#plot-type').val()
+                        var databaseId = $('#databaseSelection').val()
+                        var popupContentField = $('#popup-content').val()
+                        var latitudeSelection = $('#latitude-selection').val()
+                        var longitudeSelection = $('#longitude-selection').val()
+
+                        var datasetQuery = {
+
+                            databaseId: databaseId,
+                            plotType: plotType,
+                            popupContentField: popupContentField,
+                            latitudeSelection: latitudeSelection,
+                            longitudeSelection: longitudeSelection,
+                            queryField: queryField,
+                            queryType: queryType,
+                            queryString: queryString,
+                            queryLower: "",
+                            queryUpper: ""
+
+                        }
+
+                        datasetQueries = []
+                        datasetQueries.push(datasetQuery)
+
+                        queryDatabase(databaseId, queryType, queryField, queryString, function (data) {
+
+                            var chartType = 'map'
+                            var latitude = $('#latitude-selection').val()
+                            var longitude = $('#longitude-selection').val()
+
+                            map.remove()
+
+                            map = L.map('map').setView([51.505, -0.09], 13);
+
+                            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                maxZoom: 19,
+                                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                            }).addTo(map);
+
+                            populateMap(latitude, longitude, plotType, data, map, popupContentField)
+
+                            $('#addAnotherDatasetButton').show()
+
+                        })
+
+                    }
+
+                    function addExtraDataQuery() {
+
+                        var queryField = $('#queryField').val()
+                        var queryType = $('#queryType').val()
+                        var queryString = $('#queryString').val()
+                        var plotType = $('#plot-type').val()
+                        var databaseId = $('#databaseSelection').val()
+                        var popupContentField = $('#popup-content').val()
+                        var latitudeSelection = $('#latitude-selection').val()
+                        var longitudeSelection = $('#longitude-selection').val()
+
+                        var datasetQuery = {
+
+                            databaseId: databaseId,
+                            plotType: plotType,
+                            popupContentField: popupContentField,
+                            latitudeSelection: latitudeSelection,
+                            longitudeSelection: longitudeSelection,
+                            queryField: queryField,
+                            queryType: queryType,
+                            queryString: queryString,
+                            queryLower: "",
+                            queryUpper: ""
+
+                        }
+
+                        datasetQueries.push(datasetQuery)
+
+                        console.log(datasetQuery)
+
+                        queryDatabase(databaseId, queryType, queryField, queryString, function (data) {
+
+                            var chartType = $('#chartType').val()
+                            var latitude = $('#latitude-selection').val()
+                            var longitude = $('#longitude-selection').val()
+
+                            populateMap(latitude, longitude, plotType, data, map, popupContentField)
+
+                        })
+
+                    }
+
+                </script>

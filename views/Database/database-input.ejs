@@ -1,0 +1,31 @@
+<% include ../partials/databaseheader.ejs %>
+<div class="container" style="position: relative;">
+    
+    <h4 style="margin-top:20px">Input JSON Record</h4>
+    <div class="form-control" style="width:100%">
+        <p>Input a record in JSON Format.</p>
+    <label for="directoryInput" class="form-label">JSON Record</label>
+    <textarea onkeyup="prettyPrint()" rows="30" id='jsonDataInput' class="form-control">
+{<% for(var i = 0; i < databaseFields.length; i++){ %>
+    <% if( i == databaseFields.length-1){ %>"<%= databaseFields[i] %>":""<% } else { %>"<%= databaseFields[i] %>":"",<% } %><% } %>
+}
+    </textarea>
+    </div>
+    
+    <button  style="margin-top:30px" class="btn btn-primary" onclick="inputData('<%=database.databaseId %>')">Input</button>
+</form>
+</div>
+<script src="/modules/DatabaseScripts/databaseFunctions.js"></script>
+<script>
+
+    function prettyPrint() {
+        var ugly = $('#jsonInput').val();
+        var obj = JSON.parse(ugly);
+        var pretty = JSON.stringify(obj, undefined, 4);
+        $('#jsonInput').val(pretty);
+    }
+
+</script>
+    
+
+<% include ../partials/footer.ejs %>

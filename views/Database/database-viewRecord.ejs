@@ -1,0 +1,39 @@
+<% include ../partials/databaseheader.ejs %>
+<div class="container" style="position: relative;">
+    
+    <h4 style="margin-top:20px">JSON Record</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">JSON Record</label>
+    <textarea onkeyup="prettyPrint()" rows="30" id='jsonInput' class="form-control" readonly><%= JSON.stringify(record) %></textarea>
+    </div>
+    
+    <button  style="margin-top:30px" class="btn btn-primary" onclick="editData()">Edit</button>
+</form>
+</div>
+<script>
+
+    function prettyPrint() {
+        var ugly = $('#jsonInput').val();
+        var obj = JSON.parse(ugly);
+        var pretty = JSON.stringify(obj, undefined, 4);
+        $('#jsonInput').val(pretty);
+    }
+
+    function inputData() {
+        
+    }
+
+    function editData() {
+
+        location.href = `/database/<%=databaseId%>/updateRecord/<%=record.recordId%>`
+        
+    }
+
+    
+
+prettyPrint()
+
+</script>
+    
+
+<% include ../partials/footer.ejs %>

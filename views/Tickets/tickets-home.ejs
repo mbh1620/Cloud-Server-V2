@@ -1,0 +1,19 @@
+<% include ../partials/header.ejs %>
+
+<div class="container">
+
+<h1>Tracking Tickets</h1>
+<% if(!currentUser){ %>
+
+<% } else { %>
+    
+    <button class="btn btn-md btn-light" onclick="window.location.href='/tickets/users-tickets'">My Tickets</button>
+    <button class="btn btn-md btn-light" onclick="window.location.href='/settings'">Settings</button>
+    
+<% } %>
+
+</div>
+
+
+
+<% include ../partials/footer.ejs %>

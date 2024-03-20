@@ -1,0 +1,56 @@
+<% include ./partials/header.ejs %>
+
+<body style="background-color: rgb(98, 98, 98);">
+
+<div style="height:95%;width:auto; margin: 0 auto;">
+
+    <p style="color: white;position: absolute;float:left; left:60px;top:100px;font-size: 14pt;"><%= filename %></p>
+    <p style="color: white;position: absolute;float:left; left:60px;top:120px;font-size: 14pt;"><a onclick="goBack()" href="#">Back</a></p>
+
+
+    <img src="<%= photoPath %>" style="height:100%;width:auto;margin:0 auto;display:block">
+    <a class="carousel-control-prev" href="#" onclick="prev()" role="button" data-slide="prev" style="margin-top:150px">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#" onclick="next()" role="button" data-slide="next" style="margin-top:150px">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+
+</div>
+<form style="display:none" action="/view/photo" method="POST" id="photoFormData">
+    <input type="hidden" name="currentPath" value="" id="photoCurrentPath">
+    <input type="hidden" name="fileName" value="" id="photoFileName">
+    <input type="hidden" name="currentUser" value="<%=currentUser.name%>" id="currentUser">
+</form>
+<form style="display:none" action="/storage/viewFiles" method="POST" id="backFormData">
+  <input type="hidden" name="path" value="<%=currentPath%>" id="startingDirectory">
+</form>
+</body>
+
+<script>
+    function prev(){
+      console.log('<%=prev%>')
+      $("#photoCurrentPath").val('<%=currentPath%>');
+      $("#photoFileName").val('<%=prev%>')
+      $("#photoFormData").submit();
+    }
+
+    function next(){
+    
+      $("#photoCurrentPath").val('<%=currentPath%>');
+      $("#photoFileName").val('<%=next%>')
+      $("#photoFormData").submit();
+    }
+
+    function goBack(){
+      
+      $("#backFormData").submit()
+
+    }
+
+
+</script>
+
+<% include ./partials/footer.ejs %>

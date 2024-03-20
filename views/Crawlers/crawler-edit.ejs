@@ -1,0 +1,84 @@
+<% include ../partials/crawlerheader.ejs %>
+<div class="container" style="position: relative;">
+    <h1>Edit a Crawler</h1>
+    <form name="crawlerCreate" action="/crawlers/edit" method="POST">
+    <input style="margin-top:30px" type="text" id="nameBox" name="crawlerName" class="namebox form-control w-50" placeholder="Crawler Name"
+        aria-label="Example text with button addon" aria-describedby="button-addon1" value="<%=crawler.crawlerName%>">
+
+    <h4 style="margin-top:20px">Crawler Configuration</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">Web or File Crawler</label>
+    <select id="crawlerType" name="crawlerType" class="form-control w-25" value="<%=crawler.crawlerType%>">
+        <option><%=crawler.crawlerType%></option>
+    </select>
+    </div>
+    <h4 style="margin-top:20px">Starting Url</h4>
+    <div class="form-control" style="width:100%">
+        <label for="directoryInput" class="form-label">Starting Url or File Directory</label>
+        <input style="margin-bottom:10px" type="text" id="directoryInput" name="startingUrl" class="namebox form-control w-50"
+        aria-label="Example text with button addon" aria-describedby="button-addon1" placeholder="http://" value="<%=crawler.startingUrl%>">
+    <label for="directoryInput" class="form-label">Max Number of Levels</label>
+    <input style="margin-bottom:10px" type="number" id="directoryInput" name="maxNumberOfLevels" class="namebox form-control w-50" value="<%=crawler.maxNumberOfLevels%>"
+        aria-label="Example text with button addon" aria-describedby="button-addon1" value="">
+        <label for="directoryInput" class="form-label">Schedule /minutes</label>
+    <input style="margin-bottom:10px" type="number" id="directoryInput" class="namebox form-control w-50" value="5"
+        aria-label="Example text with button addon" aria-describedby="button-addon1" value="">
+        <label>Scrape element? </label>
+        <input type="checkbox"></br>
+        <label>Code Block for each element:</label>
+        <input type="hidden" name="crawlerId" value="<%=crawler.recordId%>">
+        <textarea form="crawlerCreate" class="form-control" rows="5" id="codeBlockTextArea" onkeyup=updateValue() name="codeBlock" placeholder="Use either root, dirs or files to choose what to do with elements. For Example 'print(files)' "><%=crawler.codeBlock%></textarea>
+    </div>
+    <h4 style="margin-top:20px">Output</h4>
+    <div class="form-control" style="width:100%">
+        <option>
+            <select>Database</select>
+            <select>Workflow</select>
+            <select>File</select>
+        </option>
+        <label>Connect to Database, File, or other alternatives..</label></br>
+        <select onchange="detectOutput()" id="outputSelection" class="form-control w-25">
+            <select></select>
+            <option>Database</option>
+            <option>Output File</option>
+            <option>IOT Device</option>
+        </select>
+        
+        <label>Database Name: </label>
+        <select class="form-control w-25">
+            <option>Database1</option>
+            <option>Database2</option>
+        </select>
+    
+    </div>
+    <input type="hidden" value="<%= currentUser.id %>" name="userId">
+    <input type="hidden" name="codeBlock" id="codeBlock">
+    <button  style="margin-top:30px" class="btn btn-primary">Save</button>
+</form>
+</div>
+<script>
+
+function updateValue() {
+
+$('#codeBlock').val($('#codeBlockTextArea').val())
+
+}
+
+function detectOutput() {
+
+    var outputSelectionValue = $('#.outputSelection').val();
+
+    if(outputSelectionValue == 'Database'){
+
+        //If outputSelectionValue is database then query the users databases for output
+
+
+
+    }
+
+}
+
+</script>
+    
+
+<% include ../partials/footer.ejs %>

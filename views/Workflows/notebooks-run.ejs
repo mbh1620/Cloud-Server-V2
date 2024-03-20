@@ -1,0 +1,163 @@
+<% include ../partials/workflowsheader.ejs %>
+
+<head>
+    <link rel="stylesheet" href="../modules/prism.css">
+</head>
+
+<div class="container" style="margin-top:100px">
+  <div class="form-group" id="formGroup1">
+    <h3>Run Notebook <%= notebookData.notebookData.notebookName %></h3>
+
+    <div class="container" id="container" style="position: relative;">
+        
+<textarea id="codeInput" spellcheck="false" oninput="update(this.value);" onkeydown="handleEvent(event)"></textarea>
+<pre id="highlighting"><code id="codeDisplay" class="language-python" style="overflow: scroll;"></code></pre>
+
+    </div>
+
+  </div>
+</div>
+<script src="../../modules/prism.js"></script>
+<script>
+
+    var x = 23
+    var y = 50
+
+    var element;
+
+    function update(text){
+
+        console.log()
+        text = text.replace(/\</g,"&lt;");
+        element = document.querySelector("#codeDisplay")
+        element.innerHTML = text;
+        Prism.highlightElement(element)
+        
+    }
+
+    function handleEvent(event){
+
+        if(event.keyCode===9){
+            var v=this.value
+            s=this.selectionStart
+            e=this.selectionEnd;
+            this.value=v.substring(0, s)+'\t'+v.substring(e);
+            this.selectionStart=this.selectionEnd=s+1;
+            update(this.value);return false;
+        }
+
+        if(event.keyCode == 13 && event.shiftKey){
+
+            runCell()
+    
+            // element.innerHTML = element.innerHTML.replace('\n', '')
+
+            $('#codeInput, #Highlighting').attr('disabled',true)
+
+            //Add new text area above that copies the values of the working text area and move make current text area blank and move down.
+
+            var containedCode = $('#codeInput').val();
+
+            $('#container').append(`<pre class="language-python"><code class="language-python elementBlock">${containedCode}</code></pre>`)
+
+            var block = document.querySelector(".elementBlock:last-child")
+
+            Prism.highlightElement(block)
+
+            $("#container").append(`<div class="container" style="height:60px;width:100%;scroll:auto;background-color:#e8e8e8"></div>`)
+
+            $('#codeInput, #Highlighting').val("");
+
+            //Move the active console down by the current height
+
+            var formgroupHeight = parseInt($('#formGroup1').css("height"))
+
+            var val = formgroupHeight - 35 + "px"
+            
+            $('#codeInput, #Highlighting').css('top', `${val}`)
+
+            element.innerHTML = "";
+
+            $('#codeInput, #Highlighting').attr('disabled', false)
+
+            x = 23
+            y = 50
+
+        } 
+
+        if(event.keyCode == 13 && !event.shiftKey && ($('#codeInput, #Highlighting').attr('disabled') == false || $('#codeInput, #Highlighting').attr('disabled') == undefined)){
+            console.log("Return pressed")
+
+            var lines = element.innerHTML.split(/\r*\n/)
+            var lineCount = lines.length;
+
+            x += 10
+            y += 30
+
+            $('#codeInput, #Highlighting').css("height", y + 'px')
+              
+        }
+
+    }
+
+
+    function runCell(){
+
+        //If code cell then run an ajax route else if its a text cell then convert to relevant html headers and paragraphs
+
+
+
+        //Ajax call to the route to run a python shell with the contents of the python shell
+
+        
+        // $.post("/notebook/runCell", data)
+
+
+
+    }
+
+</script>
+
+<style>
+
+    #codeInput, #highlighting{
+        margin: 10px;
+        margin-top:40px;
+        padding: 10px;
+        border: 0;
+        width: 100%;
+        height: 50px;
+        tab-size: 4;
+    }
+
+    #codeInput, #highlighting, #highlighting * {
+        font-size: 14pt;
+        font-family: monospace;
+        line-height: 20pt;
+    }
+
+    #codeInput, #highlighting {
+        position: absolute;
+        top:0px;
+        left:0;
+        margin:0;
+        margin-top: 10px
+    }
+
+    #codeInput {
+        z-index: 1;
+    }
+
+    #highlighting {
+        z-index: 0;
+    }
+
+    #codeInput {
+        color: transparent;
+        background: transparent;
+        caret-color: grey;
+    }
+
+</style>
+
+<% include ../partials/footer.ejs %>

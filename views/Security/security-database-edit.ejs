@@ -1,0 +1,84 @@
+<% include ../partials/securityheader.ejs %>
+<div class="container" style="position: relative;">
+    <h1>Edit Permissions for <%= database.dbName %></h1>
+    
+    <h4 style="margin-top:20px">Security Type</h4>
+    <div class="form-control" style="width:100%">
+    <select class="form-control w-25" id="securityType" onchange="showDiv()" name="securityType" value="">
+        <option value="private">Private (Default)</option>
+        <option value="limited">Limited To List of Users</option>
+        <option value="public">Public</option>
+    </select>
+    
+    <h4 style="margin-top:20px;display:none" class="usernames">Add User names to list</h4>
+    <div class="form-control usernames" style="width:100%;height:300px;display:none">
+    <textarea class="form-control" id="userList" name="userList" style="height:100%">
+    </textarea>
+    </div>
+</div>
+    
+<button  style="margin-top:30px" class="btn btn-primary" onclick="callFunction()">Update</button>
+
+</div>
+<script src="/modules/SecurityScripts/databaseSecurityFunctions.js"></script>
+<script>
+
+    function callFunction(){
+
+        var databaseId = '<%= database.databaseId %>'
+        var securityType = $('#securityType').val()
+        var userList = []
+        var permissionList = []
+
+        editDatabasePermissions(databaseId, securityType, userList, permissionList, function(){
+
+            location.href = "/"
+
+        })
+
+    }
+
+    changeSelectionBox()
+    showDiv()
+
+    function showDiv(){
+
+        var value = $('#securityType').val()
+
+        if(value == 'limited'){
+            $('.usernames').show();
+        } else {
+            $('.usernames').hide();
+        }
+
+    }
+
+    function changeSelectionBox(){
+
+        $('#securityType').html(' ');
+
+        var selectBoxValue = '<%= database.securityType %>'
+
+        var newOptions = {
+            "Private (Default)":"private",
+            "Limited To List Of Users":"limited",
+            "Public":"public"
+        };
+
+        $.each(newOptions, function(key, value) {
+            if(value == selectBoxValue){
+                $('#securityType').append($("<option></option>")
+                .attr({"value":value,
+                        "selected":true}).text(key));
+            } else {
+                $('#securityType').append($("<option></option>")
+                .attr("value", value).text(key));
+            }
+            
+        });
+    }
+
+</script>
+    
+
+<% include ../partials/footer.ejs %>

@@ -1,0 +1,78 @@
+<% include ../partials/databaseheader.ejs %>
+<div class="container" style="position: relative;">
+    <h1>Create a new Database Table</h1>
+    <form action="/database/create" method="POST" onsubmit="return validateInputs()">
+    <input style="margin-top:30px" type="text" id="nameBox" name="tableName" class="namebox form-control w-50" placeholder="Table Name"
+        aria-label="Example text with button addon" aria-describedby="button-addon1">
+
+    <h4 style="margin-top:20px">Table Configuration</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">Edit Records</label>
+    <select class="form-control w-25">
+        <option>True</option>
+        <option>False</option>
+    </select>
+    <label for="directoryInput" class="form-label">Delete Records</label>
+    <select class="form-control w-25">
+        <option>True</option>
+        <option>False</option>
+    </select>
+    <label for="directoryInput" class="form-label">Add Date-time stamp to records</label>
+    <select class="form-control w-25">
+        <option>True</option>
+        <option>False</option>
+    </select>
+    </div>
+    <h4 style="margin-top:20px">Key Configuration</h4>
+    <div class="form-control" style="width:100%">
+    
+    </div>
+    <h4 style="margin-top:20px">Schema Definition</h4>
+    <div class="form-control" style="width:100%">
+    <label for="directoryInput" class="form-label">Schema</label>
+    <textarea onkeyup="prettyPrint()" class="form-control" name="schemaDefinition" id="jsonInput" cols="20" rows="8">
+{
+    "[fieldName]":"[Datatype]",
+}
+
+    </textarea>
+    </div>
+    <h4 style="margin-top:20px">Access</h4>
+    <div class="form-control" style="width:100%">
+        <p>Input usernames that can access this table.</p>
+    <label for="directoryInput" class="form-label">Username list (Separated by comma)</label>
+    <textarea class="form-control"></textarea>
+    </div>
+    <input type="hidden" value="<%= currentUser.id %>" name="userId">
+    <button  style="margin-top:30px" class="btn btn-primary">Create</button>
+</form>
+</div>
+<script>
+
+function validateInputs(){
+
+    //Check that the name is filled in
+
+    if($('#nameBox').val() == ""){
+
+        alert("The name is not filled in!")
+
+        return false
+
+    } else {
+        return true
+    }
+
+}
+
+function prettyPrint() {
+        var ugly = $('#jsonInput').val();
+        var obj = JSON.parse(ugly);
+        var pretty = JSON.stringify(obj, undefined, 4);
+        $('#jsonInput').val(pretty);
+    }
+
+</script>
+    
+
+<% include ../partials/footer.ejs %>

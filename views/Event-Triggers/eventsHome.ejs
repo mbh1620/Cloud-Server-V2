@@ -1,0 +1,20 @@
+<% include ../partials/eventheader.ejs %>
+
+<div class="container">
+<h1>Events and Triggers</h1>
+<p>Create events or triggers to fire off workflows or other events.</p>
+<p>For example use events to fire a workflow when a certain file type is input into a directory, a number is input
+    into a database, something is found from a web crawler, or an IOT sensor is triggered.
+</p>
+<% if(!currentUser){ %>
+
+<% } else { %>
+    
+    <button class="btn btn-md btn-light" onclick="window.location.href='/events/usersEvents'">My Events and Triggers</button>
+    <button class="btn btn-md btn-light" onclick="window.location.href='/events/create'">Create a New event or Trigger</button>
+    <button class="btn btn-md btn-light" onclick="window.location.href='/events/settings'">Settings</button>
+<% } %>
+</div>
+
+
+<% include ../partials/footer.ejs %>

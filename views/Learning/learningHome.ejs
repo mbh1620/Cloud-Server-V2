@@ -1,0 +1,17 @@
+<% include ../partials/databaseheader.ejs %>
+
+<div class="container">
+<h1>Machine Learning</h1>
+<p>Create and use machine learning models.</p>
+<% if(!currentUser){ %>
+
+<% } else { %>
+    
+    <button class="btn btn-md btn-light" onclick="window.location.href='/learning/usersNetworks'">My Networks</button>
+    <button class="btn btn-md btn-light" onclick="window.location.href='/learning/settings'">Settings</button>    
+
+<% } %>
+
+</div>
+
+<% include ../partials/footer.ejs %>

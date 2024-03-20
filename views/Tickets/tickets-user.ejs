@@ -1,0 +1,41 @@
+<% include ../partials/chartheader.ejs %>
+    <div class="" style="position: relative;width:85%;margin: 0 auto;">
+        <h1>
+            Tickets
+        </h1>
+        <button onclick="location.href='/tickets/create'" class="btn btn-primary btn-sm">Create Ticket</button>
+        <div class="form-control">
+
+            <% for(var i = 0; i < tickets.length; i++){ %>
+
+                <% if (!tickets[i].ticketCompleted){ %>
+
+                <li id="<%= i %>" class="list-group-item"><a href="#" onclick="viewTicket('<%= tickets[i].recordId %>')"><%= tickets[i].ticketName %></a><button class="btn btn-primary btn-sm" style="float:right">Completed</button><button class="btn btn-primary btn-sm" style="float:right" onclick="editTicket('<%= tickets[i].recordId %>')">Edit</button></li>
+
+            <% } else { %>
+
+                <li id="<%= i %>" class="list-group-item"><a href="#" onclick="viewTicket('<%= tickets[i].recordId %>')" style="text-decoration: line-through;"><%= tickets[i].ticketName %></a><button class="btn btn-primary btn-sm" style="float:right" onclick="editTicket('<%= tickets[i].recordId %>')">Edit</button></li>
+
+             <% } }%>
+
+        </div>
+
+        <script>
+
+            function editTicket(ticketId){
+
+                location.href = "/tickets/edit/"+ticketId
+
+            }
+
+            function viewTicket(ticketId){
+
+                location.href = `/tickets/view/${ticketId}`
+
+            }
+
+        </script>
+      
+    </div>
+
+    <% include ../partials/footer.ejs %>

@@ -1,0 +1,19 @@
+<% include ./partials/codeheader.ejs %>
+
+<div class="container">
+
+<h1>Code Repositories</h1>
+<% if(!currentUser){ %>
+
+<% } else { %>
+    
+    <button class="btn btn-lg btn-light" onclick="window.location.href='/userscode/show'">My Projects</button>
+    <button class="btn btn-lg btn-light" onclick="window.location.href='/settings'">Settings</button>
+    
+<% } %>
+
+</div>
+
+
+
+<% include ./partials/footer.ejs %>

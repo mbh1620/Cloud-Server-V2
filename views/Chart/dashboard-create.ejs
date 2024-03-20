@@ -1,0 +1,126 @@
+<% include ../partials/chartheader.ejs %>
+    <div class="container" style="position: relative;">
+        <h1>Create a New Dashboard</h1>
+
+        <input style="margin-top:30px" type="text" id="dashboardName" class="namebox form-control w-50"
+            placeholder="Dashboard Name" aria-label="Example text with button addon" aria-describedby="button-addon1">
+
+    </div>     
+        
+        <h4 style="margin-top:20px">Add Charts</h4>
+        
+        <button class="btn btn-primary" onclick="addRow()">Add Row</button>
+        <button class="btn btn-danger" onclick="reset()">Reset</button>
+        <select id="numberOfColumns">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+        </select> Number of plots per row
+        <div class="form-control" id="rowContainer" style="width:100%;height:800px">
+            
+        </div>
+        <button class="btn btn-md btn-primary" onclick="saveDashboardData()">Save Dashboard</button>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+    <script src='../../modules/ChartScripts/chartView.js'></script>
+    <script src='../../modules/ChartScripts/mapView.js'></script>
+    <script src='../../modules/ChartScripts/chartFunctions.js'></script>
+
+    <!-- For adding charts over maps check https://developers.arcgis.com/esri-leaflet/samples/dynamic-chart/ -->
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+    <script>
+        var charts
+        var layout = []
+        var numberOfRows = 0;
+
+        getCharts(function(data){
+            charts = data
+            console.log(charts)
+        })
+
+
+        function addRow(){
+
+            numberOfRows += 1
+
+            //Get the number of Columns
+            $('.element').empty()
+
+            var numberOfColumns = $('#numberOfColumns').val()
+            
+            var string = ''
+
+            for(var i = 0; i < numberOfColumns; i++){
+
+                string += `<div id="element-${i}" class="form-control element box-elements" style="float:left;height:${100/numberOfRows}%;width:${(1/numberOfColumns)*100}%"></div>`
+
+            }
+
+            console.log($('.box-elements'))
+
+            for(var i = 0; i < $('.box-elements').length; i++){
+                console.log("changing the height")
+                $($('.box-elements')[i]).height(`${100/numberOfRows}%`)
+            }
+
+            $('#rowContainer').append(string)
+            $('.element').append(`<select class="form-control selectBox w-25"></select>`)
+
+            for(var i = 0; i < charts.length; i++){
+
+                $('.selectBox').append(`<option>${charts[i].chartName}</option`)
+
+            }
+
+            layout.push(parseInt(numberOfColumns))
+
+        }
+
+        function reset(){
+
+            $('#rowContainer').empty()
+
+        }
+
+        function saveDashboardData(){
+
+            var dashboardName = $('#dashboardName').val()
+
+            if(dashboardName == ""){
+
+                alert("Please give your Dashboard a name!")
+                return 0
+            }
+
+            chartValues = []
+
+            var widgets = $('#rowContainer .selectBox').each(function(i, obj){
+
+                chartValues.push($(obj).val())
+
+            })
+
+            dashboard = {
+
+                dashboardName: dashboardName,
+                layout: layout,
+                chartValues: chartValues
+
+            }
+
+            //Ajax Function to save dashboard route
+            saveDashboard(dashboard, function(){
+                location.href="/dashboard/viewAll"
+            })
+
+        }
+
+    </script>
+
+
+    <% include ../partials/footer.ejs %>

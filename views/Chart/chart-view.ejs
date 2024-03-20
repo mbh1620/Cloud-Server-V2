@@ -1,0 +1,113 @@
+<% include ../partials/chartheader.ejs %>
+    <div class="" style="position: relative;width:85%;margin: 0 auto;">
+        <h1 id="chartTitle"></h1>
+
+        <% if(chart.chartType !='map' && chart.chartType !='table' ){ %>
+
+            <%include ../Chart/chart-template.ejs %>
+
+                <% } else if(chart.chartType=='map' ){ %>
+
+                    <%include ../Chart/map-template.ejs %>
+
+                        <% } else if(chart.chartType=='table' ){ %>
+
+                            <%include ../Database/table-template.ejs %>
+
+                                <% } %>
+
+                                    <script src='/modules/DatabaseScripts/databaseFunctions.js'></script>
+                                    <script src='/modules/ChartScripts/tableFunctions.js'></script>
+                                    <script src='/modules/ChartScripts/chartFunctions.js'></script>
+                                    <script>
+
+                                        var chart;
+                                        var chartId = '<%= chart.recordId %>'
+                                        var chartType = '<%= chart.chartType %>'
+
+                                        getChartConfig(chartId, function (data) {
+
+                                            var databaseName = data.datasetQueries[0].databaseId
+                                            $('#chartTitle').html(data.chartName)
+                                            var queryType = data.datasetQueries[0].queryType
+                                            var queryField = data.datasetQueries[0].queryField
+                                            var queryString = data.datasetQueries[0].queryString
+                                            var chartConfig = data
+
+                                            queryDatabase(databaseName, queryType, queryField, queryString, function (data) {
+
+                                                getDatabaseSchema(databaseName, function (databaseSchema) {
+
+                                                    if (chartType != "map" && chartType != "table") {
+
+                                                        chartElement = $('#chartCanvas')
+
+                                                        var xAxisField = '<%= chart.xAxis %>'
+                                                        var yAxisField = '<%= chart.yAxis %>'
+
+                                                        var preparedData = prepareData(data, xAxisField, yAxisField)
+
+                                                        chart = populateChart(chartElement, 'testChart1', chartType, xAxisField, yAxisField, preparedData, databaseSchema)
+
+                                                    } else if (chartType != "table") {
+
+                                                        var latitudeSelection = chartConfig.datasetQueries[0].latitudeSelection
+                                                        var longitudeSelection = chartConfig.datasetQueries[0].longitudeSelection
+                                                        var plotType = chartConfig.datasetQueries[0].plotType
+                                                        var popupContentField = chartConfig.datasetQueries[0].popupContentField
+
+                                                        populateMap(latitudeSelection, longitudeSelection, plotType, data, map, popupContentField)
+
+                                                    } else if (chartType != "map") {
+
+                                                        inputTableData(data, databaseSchema, 'results-table2')
+
+                                                    }
+                                                })
+                                            })
+
+                                            for (var i = 1; i < data.datasetQueries.length; i++) {
+
+                                                //Query the different databases with the datasetQueries
+
+                                                var databaseId = data.datasetQueries[i].databaseId
+                                                var queryType = data.datasetQueries[i].queryType
+                                                var queryField = data.datasetQueries[i].queryField
+                                                var queryString = data.datasetQueries[i].queryString
+                                                var datasetQuery = data.datasetQueries[i]
+                                                var plotType = datasetQuery.plotType
+                                                    
+
+                                                queryDatabase(databaseId, queryType, queryField, queryString, function (data) {
+
+                                                    getDatabaseSchema(databaseName, function (databaseSchema) {
+
+                                                        if (chartType != "map" && chartType != "table") {
+
+                                                            chartElement = $('#chartCanvas')
+
+                                                            var xAxisField = '<%= chart.xAxis %>'
+                                                            var yAxisField = '<%= chart.yAxis %>'
+
+                                                            var preparedData = prepareData(data, xAxisField, yAxisField)
+                                                    
+                                                            chart = addNewDataSetToChart(chart, chartType, preparedData, xAxisField, databaseSchema)
+
+                                                        } else if (chartType != "table") {
+
+                                                            var latitudeSelection = datasetQuery.latitudeSelection
+                                                            var longitudeSelection = datasetQuery.longitudeSelection
+                                                            var popupContentField = datasetQuery.popupContentField
+
+                                                            populateMap(latitudeSelection, longitudeSelection, plotType, data, map, popupContentField)
+                                                            
+                                                        }
+                                                    })
+                                                })
+                                            }
+                                        })
+
+                                    </script>
+    </div>
+
+    <% include ../partials/footer.ejs %>

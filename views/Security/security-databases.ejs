@@ -1,0 +1,47 @@
+<% include ../partials/securityheader.ejs %>
+
+  <div class="container" style="margin-top:100px">
+    <div class="form-group">
+      <nav aria-label="breadcrumb">
+        <ol id="breadcrumblist" class="breadcrumb">
+          <li class="breadcrumb-item item active" aria-current="page"><a href="#" id="homeDirectoryButton"
+              onclick="homeDirectory()"><i class="fas fa-folder"></i></a></li>
+
+        </ol>
+      </nav>
+
+      <!-- File upload input -->
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Search</span>
+        </div>
+        <input type="text" id="searchinput" class="form-control" placeholder="Search Databases" aria-label="Username"
+          aria-describedby="basic-addon1">
+      </div>
+      <div id="itemContainer">
+        <ul id="list" class="list-group" style="max-height: 500px; overflow: scroll;">
+            <% for(var i = 0; i < databases.length; i++){ %>
+
+               <li class="list-group-item" style="padding-top:10px;padding-bottom:10px"><%= databases[i].dbName %><button class="btn btn-sm btn-primary" style="float:right;height:30px;" onclick="editDatabasePermissions('<%=databases[i].databaseId%>')">Edit Permissions</button></li>
+
+            <% } %>
+
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <form id="editPermissionsPage" style="display:none" action="/security/database" method="POST">
+    <input type="hidden" id="databaseId" name="databaseId" value="">
+  </form>
+  <script>
+
+    function editDatabasePermissions(databaseId){
+
+      $('#databaseId').val(databaseId)
+      $('#editPermissionsPage').submit()
+
+    }
+
+  </script>
+  <% include ../partials/footer.ejs %>

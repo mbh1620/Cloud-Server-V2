@@ -1,0 +1,147 @@
+<% include ../partials/chartheader.ejs %>
+    <div class="container" style="position: relative;">
+        <h1>Update <%=dashboard.dashboardName%> Dashboard</h1>
+
+        <input style="margin-top:30px" type="text" id="dashboardName" class="namebox form-control w-50"
+            placeholder="Dashboard Name" aria-label="Example text with button addon" aria-describedby="button-addon1" value="<%=dashboard.dashboardName%>">
+
+    </div>     
+        
+        <h4 style="margin-top:20px">Add Charts</h4>
+        
+        <button class="btn btn-primary" onclick="addRow()">Add Row</button>
+        <button class="btn btn-danger" onclick="reset()">Reset</button>
+        <select id="numberOfColumns">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+        </select> Number of plots per row
+        <div class="form-control" id="rowContainer" style="width:100%;height:800px">
+            
+        </div>
+        <button class="btn btn-md btn-primary" onclick="updateDashboardData()">Save Dashboard</button>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+    <script src='../../modules/ChartScripts/mapView.js'></script>
+    <script src='../../modules/DatabaseScripts/databaseFunctions.js'></script>
+    <script src='../../modules/ChartScripts/chartFunctions.js'></script>
+
+    <!-- For adding charts over maps check https://developers.arcgis.com/esri-leaflet/samples/dynamic-chart/ -->
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+    <script>
+        var charts
+        var layout = []
+
+        var dashboardId = '<%= dashboard.recordId %>'
+        var dashboardsDatabaseId = '<%= dashboardDatabaseId %>'
+        
+        getDashboard(dashboardId, dashboardsDatabaseId, function(dashboardData){
+
+            //populate the dashboard values
+            getCharts(function(data){
+            
+            charts = data
+
+            populateDashboardData(dashboardData)
+
+             })  
+
+            
+
+        })
+
+        //Function to add in elements from the saved dashboard
+
+        function populateDashboardData(dashboardData){
+
+            console.log(dashboardData)
+
+            for(var i = 0; i < dashboardData.record[0].layout.length; i++){
+
+                addRow(dashboardData.record[0].layout[i])
+
+            }
+
+           for(var i = 0; i < $('.selectBox').length; i++){
+
+                $($('.selectBox')[i]).val(dashboardData.record[0].chartValues[i])
+
+           }
+
+        }
+
+        function addRow(numberOfColumns){
+
+            //Get the number of Columns
+            $('.element').empty()
+    
+            var string = ''
+
+            for(var i = 0; i < numberOfColumns; i++){
+
+                string += `<div id="element-${i}" class="form-control element" style="float:left;height:500px;width:${(1/numberOfColumns)*100}%"></div>`
+
+            }
+
+            $('#rowContainer').append(string)
+            $('.element').append(`<select class="form-control selectBox w-25"></select>`)
+
+            for(var i = 0; i < charts.length; i++){
+
+                $('.selectBox').append(`<option value='${charts[i].chartName}'>${charts[i].chartName}</option`)
+
+            }
+
+            layout.push(parseInt(numberOfColumns))
+
+        }
+
+        function reset(){
+
+            $('#rowContainer').empty()
+
+        }
+
+        function updateDashboardData(){
+
+            var dashboardName = $('#dashboardName').val()
+
+            if(dashboardName == ""){
+
+                alert("Please give your Dashboard a name!")
+                return 0
+            }
+
+            chartValues = []
+
+            var widgets = $('#rowContainer .selectBox').each(function(i, obj){
+
+                chartValues.push($(obj).val())
+
+            })
+
+            dashboard = {
+
+                recordId: '<%= dashboard.recordId %>',
+                dateTime: '<%= dashboard.dateTime %>',
+                dashboardName: dashboardName,
+                layout: layout,
+                chartValues: chartValues
+
+            }
+
+            updateDashboard(dashboard, function(){
+                location.href="/dashboard/viewAll"
+            })
+
+        }
+
+    </script>
+
+
+    <% include ../partials/footer.ejs %>

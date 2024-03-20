@@ -1,0 +1,159 @@
+<% include ../partials/chartheader.ejs %>
+    <div class="container" style="position: relative;">
+        <a href="/chart/home">Back</a>
+        <h1>Create Chart (Chart Data)</h1>
+        <p>Create a chart using data from a database so that the chart can then be embedded in a dashboard.</p>
+        <h4 style="margin-top:20px">Chart Name</h4>
+        <input style="margin-top:30px" type="text" id="chartName" class="namebox form-control w-50"
+            placeholder="Chart Name" aria-label="Example text with button addon" aria-describedby="button-addon1">
+
+        <h4 style="margin-top:20px">Chart Creation</h4>
+        <div class="form-control" style="width:100%">
+            <label for="directoryInput" class="form-label">Chart Type</label>
+            <select class="form-control w-25" onchange="" name="deviceType" id="chartType">
+                <option value="line">Line</option>
+                <option value="scatter">Scatter</option>
+                <option value="bar">Bar</option>
+                <option value="pie">Pie</option>
+                <option value="doughnut">Donut</option>
+                <option value="frequency">Frequency Chart</option>
+                <option value="histogram">Histogram</option>
+            </select>
+            <label>Chart Data Source</label>
+            <select class="form-control w-25" id="databaseSelection" onchange="changeDatabaseSelection()">
+                <option selected disabled hidden>Select Database</option>
+                <% for (var i=0; i < usersDatabases.length; i++){ %>
+                    <option value="<%= usersDatabases[i].databaseId %>">
+                        <%= usersDatabases[i].dbName %>
+                    </option>
+                    <% } %>
+            </select>
+
+        </div>
+        <h4 style="margin-top:20px" id="chartConfigTitle">Chart Configuration</h4>
+        <div class="form-control" id="chartConfig" style="width:100%;padding:20px">
+            <label for="directoryInput" class="form-label">X Axis</label>
+            <select class="form-control w-25 field" name="deviceType" id="x-axis-selection">
+
+            </select>
+            <label for="directoryInput" class="form-label">Y Axis</label>
+            <select class="form-control w-25 field" name="deviceType" id="y-axis-selection">
+
+            </select>
+        </div>
+        
+        <% include ../Database/querybox-template.ejs %>
+        <% include ../Chart/chart-template.ejs %>
+
+            <button class="btn btn-sm btn-primary" onclick="saveChart()">Save Chart</button>
+            <script src='/modules/ChartScripts/chartFunctions.js'></script>
+                <script>
+                    
+                    var chart; 
+                    var databaseSchema;
+                    var datasetQueries = []
+    
+                    function changeDatabaseSelection() {
+
+                        var databaseId = $('#databaseSelection').val()
+
+                        //Query to get the field
+
+                        getDatabaseSchema(databaseId, function (data) {
+
+                            databaseSchema = data;
+
+                            var fields = Object.keys(data)
+
+                            $('.field').empty()
+                            var string = ""
+                            for (var i = 0; i < fields.length; i++) {
+                                string += "<option>" + fields[i] + "</option>"
+                            }
+
+                            string += "<option>recordId</option>"                            
+                            string += "<option>dateTime</option>"                            
+                            $('.field').append(string)
+
+                        })
+
+                    }
+
+                    function runQuery() {
+                        var chartElement = $('#chartCanvas')
+
+                        if(chart != undefined){
+                            chart.destroy()
+                        }
+
+                        var databaseId = $('#databaseSelection').val()
+                        var queryField = $('#queryField').val()
+                        var queryType = $('#queryType').val()
+                        var queryString = $('#queryString').val()
+
+                        var datasetQuery = {
+
+                            databaseId: databaseId,
+                            queryField:queryField,
+                            queryType:queryType,
+                            queryString:queryString,
+                            queryLower: "",
+                            queryUpper: ""
+
+                        }
+
+                        datasetQueries = []
+                        datasetQueries.push(datasetQuery)
+
+                        queryDatabase(databaseId, queryType, queryField, queryString, function(data){
+
+                            var chartType = $('#chartType').val()
+
+                            var xAxisField = $('#x-axis-selection').val()
+                            var yAxisField = $('#y-axis-selection').val()
+
+                            var preparedData = prepareData(data, xAxisField, yAxisField)
+
+                            chart = populateChart(chartElement, 'testChart1', chartType, xAxisField, yAxisField, preparedData, databaseSchema)
+
+                            $('#addAnotherDatasetButton').show()
+                        })
+
+                    }
+
+                    function addExtraDataQuery(){
+
+                        var queryField = $('#queryField').val()
+                        var queryType = $('#queryType').val()
+                        var queryString = $('#queryString').val()
+
+                        var databaseId = $('#databaseSelection').val()
+
+                        var datasetQuery = {
+
+                            databaseId: databaseId,
+                            queryField:queryField,
+                            queryType:queryType,
+                            queryString:queryString,
+                            queryLower: "",
+                            queryUpper: ""
+
+                        }
+
+                        datasetQueries.push(datasetQuery)
+
+                        queryDatabase(databaseId, queryType, queryField, queryString, function(data){
+
+                            var chartType = $('#chartType').val()
+
+                            var xAxisField = $('#x-axis-selection').val()
+                            var yAxisField = $('#y-axis-selection').val()
+
+                            var preparedData = prepareData(data, xAxisField, yAxisField)
+
+                            chart = addNewDataSetToChart(chart, chartType, preparedData, xAxisField, databaseSchema)
+
+                    })
+                }
+            
+                </script>
