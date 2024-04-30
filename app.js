@@ -37,17 +37,9 @@ Look into vhost for setting sub domains for users hosted applications and static
 https://www.npmjs.com/package/vhost
 
 */
-
-if (process.env.NODE_ENV === 'production') {
-    testFolder = '/media/pi/ELEMENTS\ B/';
-    string_len = 22;
-    production_flag = true
-}
-
 if (process.env.NODE_ENV === 'appleProduction') {
     testFolder = '/Volumes/ELEMENTS\ B/';
     string_len = 21;
-    production_flag = true
 }
 
 if (process.env.NODE_ENV === 'development') {
@@ -55,10 +47,11 @@ if (process.env.NODE_ENV === 'development') {
     string_len = 59;
 }
 
-if (process.env.NODE_ENV === 'github'){
-    testFolder = __dirname + '/public/'
-    string_len = testFolder.length+1;
+if (process.env.NODE_ENV === 'development2') {
+    testFolder = '/Users/matthewhaywood/Desktop/cloudserverproject2/Cloud-Server-V2/public/'
+    string_len = 59;
 }
+
 
 //PASSPORT SETUP
 const initializePassport = require('./passport-config');
