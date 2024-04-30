@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === 'appleProduction') {
 }
 
 if (process.env.NODE_ENV === 'development') {
-    testFolder = '/Users/matthaywood/Desktop/StorageSite/StorageSite/public/'
+    testFolder = '/Users/matthaywood/Desktop/storageSiteV2/Cloud-Server-V2/public/'
     string_len = 59;
 }
 

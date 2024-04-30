@@ -41,6 +41,12 @@
       "name": "JohnDoe3",
       "email": "JohnDoe3@email.com",
       "password": "$2a$10$wtHL.LvTnHcMDUhE7wt2OORVN5y91PI0WYHnx2g1C/gYz9/io49mK"
+    },
+    {
+      "id": "1711059340140",
+      "name": "newAccountB",
+      "email": "newAccountB@gmail.com",
+      "password": "$2a$10$iBCbKP15KavTXcfiukJZfuST355bY77bni47eYUyOqSs7KjGkmAXq"
     }
   ]
 }
