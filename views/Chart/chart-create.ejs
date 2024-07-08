@@ -91,6 +91,17 @@
                         var queryType = $('#queryType').val()
                         var queryString = $('#queryString').val()
 
+                        if(queryType == 'Inbetween'){
+
+                            queryString = {
+
+                                lowerQueryString: $('#lowerQueryString').val(),
+                                upperQueryString: $('#upperQueryString').val()
+
+                            }
+
+                        }
+
                         var datasetQuery = {
 
                             databaseId: databaseId,
@@ -104,6 +115,8 @@
 
                         datasetQueries = []
                         datasetQueries.push(datasetQuery)
+
+                        
 
                         queryDatabase(databaseId, queryType, queryField, queryString, function(data){
 
