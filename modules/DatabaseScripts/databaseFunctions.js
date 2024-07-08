@@ -6,8 +6,8 @@ function queryDatabase(databaseId, queryType, queryField, queryString, successCa
 
     if(queryType == 'Inbetween'){
         data = {
-            lowerQueryString: queryType.lowerQueryString,
-            upperQueryString: queryType.upperQueryString,
+            lowerQueryString: queryString.lowerQueryString,
+            upperQueryString: queryString.upperQueryString,
             queryField: queryField,
             queryType: queryType
         }

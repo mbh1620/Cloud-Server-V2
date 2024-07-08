@@ -93,7 +93,21 @@ function getRecordContaining(user, database, searchKey, searchValue) {
 
 }
 
-function getRecordInbetween(user, database) {
+function getRecordInbetween(user, database, searchKey, searchValueUpper, searchValueLower) {
+
+    if (checkDatabaseExists(user, database)){
+
+        return getRecordInbetweenFromFile(user, database, searchKey, searchValueUpper, searchValueLower)
+
+    } else {
+
+        securityCheck(user, database, function() {
+
+            return getRecordInbetweenFromFile(user, database, searchKey, searchValueUpper, searchValueLower)
+
+        })
+
+    }
 
 }
 
@@ -532,6 +546,48 @@ function getRecordFromFile(user, database, searchKey, searchValue) {
     })
 
     return searchedRecord
+
+}
+
+function getRecordInbetweenFromFile(user, database, searchKey, searchValueUpper, searchValueLower){
+
+    var fullPath = pathFunc.join(testFolder, database.dataFile)
+
+    var data = JSON.parse(fs.readFileSync(fullPath))
+
+    var searchedRecord = []
+
+    var schema = getSchema(user, database)
+
+    //The searchValue can either be a number, date or 
+
+    if (schema[searchKey] == 'number'){
+
+        searchValueUpper = Number(searchValueUpper)
+        searchValueLower = Number(searchValueLower)
+
+        let obj2 = data.records.filter((o, i) => {
+            
+            if (o[searchKey] <= searchValueUpper && o[searchKey] >= searchValueLower) {
+                searchedRecord.push(o)
+            }
+
+        })
+    
+        return searchedRecord
+
+    } else if(schema[searchKey] == 'date') {
+
+        let obj2 = data.records.filter((o, i) => {
+
+            if (new Date(o[searchKey]).getTime() < new Date(searchValueUpper).getTime() && new Date(o[searchKey]).getTime() > new Date(searchValueLower).getTime()) {
+                searchedRecord.push(o)
+            }
+        })
+
+        return searchedRecord
+
+    }
 
 }
 
@@ -1066,7 +1122,7 @@ function sumElements(user, database, databaseFieldToSum){
 }
 
 module.exports = { getUsersDatabases, createDatabase, deleteDatabase, 
-    putRecord, getRecords, getRecord, getRecordContaining, updateRecord, 
+    putRecord, getRecords, getRecord, getRecordContaining, getRecordInbetween, updateRecord, 
     deleteRecord, getSchema, getSchemaFields, updateSchema, checkDatabaseExists, getDatabaseObjectByName,
     getDatabase, setDbPrivate, setDbLimited, setDbPublic, createDBRefDatabase, putREFRecord, 
     getREFRecord, updateREFRecord, deleteREFRecord, securityCheck, sumElements, numberOfRecords}

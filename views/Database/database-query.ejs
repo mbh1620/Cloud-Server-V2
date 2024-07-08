@@ -108,6 +108,17 @@ function runQuery(databaseId){
     var queryField = $('#queryField').val()
     var queryType = $('#queryType').val()
 
+    if (queryType == 'Inbetween'){
+
+        queryString = {
+
+            lowerQueryString: $('#lowerQueryString').val(),
+            upperQueryString: $('#upperQueryString').val()
+
+        }
+
+    }
+
     queryDatabase(databaseId, queryType, queryField, queryString, function(receivedData){
 
         updateResultBox(receivedData.record)

@@ -7,7 +7,7 @@ var router = express.Router()
 
 var { getUsersDatabases, createDatabase, putRecord, getSchemaFields,
     getDatabase, getSchema, getRecord, getRecords, updateRecord, deleteRecord,
-    getRecordContaining, updateSchema, deleteDatabase} = require("./databaseFunctions");
+    getRecordContaining, getRecordInbetween, updateSchema, deleteDatabase} = require("./databaseFunctions");
 
 
 //Index routes
@@ -135,7 +135,8 @@ router.post("/database/query/:databaseId", function(req,res){
             record = getRecordContaining(req.user, database, req.body.queryField, req.body.queryString)
             break;
         case "Inbetween":
-            record = getRecordInbetween(user, database) //Not yet implemented
+            console.log(req.body)
+            record = getRecordInbetween(req.user, database, req.body.queryField, req.body.upperQueryString, req.body.lowerQueryString) //Not yet implemented
             break;
     }
     
