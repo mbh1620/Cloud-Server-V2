@@ -49,6 +49,16 @@ function populateChart(chartElement, chartName, chartType, xField, yField, data,
     dataSchema['recordId'] = 'string'
     dataSchema['dateTime'] = 'date'
 
+    if (dataSchema[xField] == 'date'){
+
+        data.sort((a,b) => new Date(a['x']) - new Date(b['x']));
+
+    } else if(dataSchema[yField] == 'date'){
+
+        data.sort((a,b) => new Date(a['y']) - new Date(b['y']));
+
+    }
+
     switch(chartType) {
 
         case 'line':
