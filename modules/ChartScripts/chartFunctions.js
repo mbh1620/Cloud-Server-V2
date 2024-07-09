@@ -331,6 +331,28 @@ function createFrequencyChart(data){
 
     var frequencies = returnFrequencyOfData(data)
 
+    //Get keys and sort by the values
+
+    let sortable = []
+
+    for (var field in frequencies) {
+
+        sortable.push([field, frequencies[field]])
+
+    }
+
+    sortable.sort(function(a, b){
+        return b[1] - a[1];
+    })
+
+    frequencies = {}
+
+    for(var i = 0; i < sortable.length; i++){
+
+        frequencies[sortable[i][0]] = sortable[i][1];
+
+    }
+
     var options =  {
         // The data for our dataset
         type: 'bar',
